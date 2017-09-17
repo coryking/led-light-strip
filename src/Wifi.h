@@ -12,6 +12,7 @@
 #include "config.h"
 
 void reconnectWiFi() {
+    Serial.println("Attempting to reconnect to Wifi....");
     WiFi.begin(YOUR_WIFI_SSID, YOUR_WIFI_PASSWD);
 }
 

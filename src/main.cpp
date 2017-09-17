@@ -1,10 +1,17 @@
 #define FASTLED_ESP8266_RAW_PIN_ORDER
-#define FASTLED_INTERRUPT_RETRY_COUNT 1
+#define FASTLED_ALLOW_INTERRUPTS 0
+//#define FASTLED_INTERRUPT_RETRY_COUNT 1
+//#define DEBUG_ESP_OTA
+//#define DEBUG_ESP_PORT Serial
+#define OTA_DEBUG Serial
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <FastLED.h>
 #include "Wifi.h"
 #include "MqttPubSub.h"
+#include <ESP8266mDNS.h>
+#include <ArduinoOTA.h>
+
 
 
 // How many leds in your strip?
@@ -13,12 +20,12 @@
 // For led chips like Neopixels, which have a data line, ground, and power, you just
 // need to define DATA_PIN.  For led chipsets that are SPI based (four wires - data, clock,
 // ground, and power), like the LPD8806 define both DATA_PIN and CLOCK_PIN
-#define DATA_PIN D2
+#define DATA_PIN 4
 
 #define DEFAULT_BRIGHTNESS 127
 #define HSV_BRIGHTNESS 255
 
-#define FRAMES_PER_SECOND  120
+#define FRAMES_PER_SECOND  60
 
 
 // Define the array of leds
@@ -32,14 +39,21 @@ uint8_t  lastBrightness = 0;
 WiFiClient espClient;
 MqttPubSub mqttPubSub(espClient);
 
+CRGBPalette16 targetPalette = CRGBPalette16(ledColorValue);
+
+
 char hostString[16] = {0};
 
 long lastWifiReconnectAttempt = 0;
 
 void readFromEEPROM();
 void writeToEEPROM();
+
+void newTargetPalette();
+
 void showNewColor() {
     Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
+    newTargetPalette();
     writeToEEPROM();
 }
 
@@ -82,6 +96,8 @@ void setup() {
     Serial.println();
     Serial.println(hostString);
     setupWiFi();
+    ArduinoOTA.begin();
+
 
     FastLED.addLeds<SK6812, DATA_PIN, GRB>(leds, NUM_LEDS);
     FastLED.setCorrection( TypicalLEDStrip );
@@ -96,7 +112,7 @@ void setup() {
         readFromEEPROM();
     }
     FastLED.setBrightness(0);
-
+    FastLED.showColor(CRGB::Black);
 
     mqttPubSub
         .setLightHueCallback(setHueCb)
@@ -106,6 +122,10 @@ void setup() {
 
     mqttPubSub.setReconnectCallback(didConnectMQTT);
     mqttPubSub.connect();
+
+    if (!MDNS.begin(hostString)) {
+        Serial.println("Error setting up MDNS responder!");
+    }
 
 }
 
@@ -123,8 +143,12 @@ void writeToEEPROM() {
     EEPROM.commit();
 }
 
-
 void loop() {
+    static uint16_t  dist;
+    static uint16_t  scale=30;
+    static uint8_t maxChanges = 48;
+    static CRGBPalette16 currentPalette = CRGBPalette16(CRGB::Black);
+
     mqttPubSub.loop();
     EVERY_N_MILLISECONDS(1000 / FRAMES_PER_SECOND) {
         if(powerState == POWERING_ON) {
@@ -144,12 +168,29 @@ void loop() {
             mqttPubSub.publishPower(false);
         }
         if(powerState == POWER_ON) {
-            FastLED.showColor(ledColorValue);
+            FastLED.show();
+            //FastLED.showColor(ledColorValue);
         }
     }
     EVERY_N_MILLISECONDS_I(SHOW_FPS, 5000) {
         Serial.printf("FPS: %i\n", FastLED.getFPS());
     }
+
+    EVERY_N_MILLISECONDS_I(NOISE_THING, 10) {
+        nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);  // Blend towards the target palette
+        for(int i = 0; i < NUM_LEDS; i++) {                                      // Just ONE loop to fill up the LED array as all of the pixels change.
+            uint8_t index = inoise8(i*scale, dist+i*scale) % 255;                  // Get a value from the noise function. I'm using both x and y axis.
+            leds[i] = ColorFromPalette(currentPalette, index, 255, LINEARBLEND);   // With that value, look up the 8 bit colour palette value and assign it to the current LED.
+        }
+        dist += beatsin8(10,1, 4);                                               // Moving along the distance (that random number we started out with). Vary it a bit with a sine wave.
+        // In some sketches, I've used millis() instead of an incremented counter. Works a treat.
+    }
+
+    EVERY_N_SECONDS_I(CHANGE_PALETTE, 5) {             // Change the target palette to a random one every 5 seconds.
+        newTargetPalette();
+    }
+
+
     if(WiFi.status() != WL_CONNECTED) {
         long now = millis();
         if (now - lastWifiReconnectAttempt > 5000) {
@@ -159,7 +200,28 @@ void loop() {
 
             if (WiFi.status() == WL_CONNECTED) {
                 lastWifiReconnectAttempt = 0;
+                ArduinoOTA.begin();
             }
         }
     }
+
+    ArduinoOTA.handle();
+    yield();
+}
+#define max(a,b) ((a)>(b)?(a):(b))
+#define min(a,b) ((a)<(b)?(a):(b))
+void newTargetPalette() {
+    uint8_t ms = 0;
+
+    if(ledColorValue.s > 127) {
+        ms = min(255, ledColorValue.s + 64);
+    } else {
+        ms = max(0, ledColorValue.s - 64);
+    }
+
+    targetPalette = CRGBPalette16(
+                CHSV(random(ledColorValue.h-6, ledColorValue.h+6), ledColorValue.s, HSV_BRIGHTNESS),// random8(128,255)),
+                CHSV(random(ledColorValue.h-6, ledColorValue.h+6), ledColorValue.s, HSV_BRIGHTNESS), //random8(128,255)),
+                CHSV(ledColorValue.h, ms, HSV_BRIGHTNESS), //random8(128,255)),
+                CHSV(ledColorValue.h, ledColorValue.s, HSV_BRIGHTNESS)); //random8(128,255)));
 }
