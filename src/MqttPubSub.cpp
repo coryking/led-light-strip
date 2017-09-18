@@ -7,7 +7,7 @@
 
 void MqttPubSub::mqttCallback(char *topic, byte *payload, unsigned int length) {
 
-    Serial.printf("Message arrived [%s]\n", topic);
+    syslog.logf(LOG_INFO, "Message arrived [%s]\n", topic);
 
     for (int i = 0; i < length; i++) {
         Serial.print((char) payload[i]);
@@ -74,7 +74,9 @@ void MqttPubSub::loop() {
         if (now - lastReconnectAttempt > 5000) {
             lastReconnectAttempt = now;
             // Attempt to reconnect
+            syslog.log(LOG_INFO, "Attempting to reconnect to MQTT");
             if (this->reconnect()) {
+                syslog.log(LOG_INFO, "Successful attempt to reconnect to MQTT!");
                 lastReconnectAttempt = 0;
             }
         }
@@ -130,35 +132,34 @@ void MqttPubSub::setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, byte *
     message_buff[i] = '\0';
     if(cb != NULL) {
         uint32_t intMsg = map(atoi(message_buff), ol, oh, 0, 255);
-        Serial.println(intMsg);
+        syslog.logf(LOG_DEBUG, "Payload value was: '%i'", intMsg);
 
         cb(intMsg);
     }
 }
 
 void MqttPubSub::publish(String &topic, const char* value) {
-    Serial.printf("pub: [%s] to '%s'\n", value, topic.c_str());
+    syslog.logf(LOG_INFO, "pub: [%s] to '%s'\n", value, topic.c_str());
     this->client.publish(topic.c_str(), value);
 
 }
 
 void MqttPubSub::subscribe(String &topic) {
-    Serial.printf("Subscribing to '%s'\n", topic.c_str());
+    syslog.logf(LOG_INFO, "Subscribing to '%s'\n", topic.c_str());
     this->client.subscribe(topic.c_str());
 }
 
 void MqttPubSub::connect() {
-    Serial.print("Connecting to MQTT");
+    syslog.logf(LOG_INFO, "Connecting to MQTT");
     int attempts=0;
     while(!this->client.connected() && attempts < 20) {
-        Serial.print(".");
+        syslog.logf(LOG_DEBUG,"reconnect to mqtt.... (%i)", attempts);
         this->reconnect();
 
         attempts++;
         delay(100);
     }
-    Serial.println();
-    Serial.println("Connected to MQTT...");
+    syslog.logf(LOG_INFO, "Connected to MQTT...");
 }
 
 void MqttPubSub::setReconnectCallback(const MqttPubSub::ReconnectCallback reconnectCallback) {

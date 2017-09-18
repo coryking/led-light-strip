@@ -1,5 +1,6 @@
 #define FASTLED_ESP8266_RAW_PIN_ORDER
-#define FASTLED_ALLOW_INTERRUPTS 0
+#define FASTLED_DEBUG_COUNT_FRAME_RETRIES
+//#define FASTLED_ALLOW_INTERRUPTS 0
 //#define FASTLED_INTERRUPT_RETRY_COUNT 1
 //#define DEBUG_ESP_OTA
 //#define DEBUG_ESP_PORT Serial
@@ -11,7 +12,9 @@
 #include "MqttPubSub.h"
 #include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
-
+#include <WiFiUdp.h>
+#include <Syslog.h>
+#include "config.h"
 
 
 // How many leds in your strip?
@@ -41,6 +44,14 @@ MqttPubSub mqttPubSub(espClient);
 
 CRGBPalette16 targetPalette = CRGBPalette16(ledColorValue);
 
+WiFiUDP udpClient;
+Syslog syslog(udpClient, SYSLOG_PROTO_BSD);
+
+
+#ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
+extern uint32_t _frame_cnt;
+extern uint32_t _retry_cnt;
+#endif
 
 char hostString[16] = {0};
 
@@ -98,17 +109,21 @@ void setup() {
     setupWiFi();
     ArduinoOTA.begin();
 
+    syslog.server(SYSLOG_SERVER, SYSLOG_PORT);
+    syslog.deviceHostname(hostString);
+    syslog.appName(APP_NAME);
+    syslog.defaultPriority(LOG_DAEMON);
 
     FastLED.addLeds<SK6812, DATA_PIN, GRB>(leds, NUM_LEDS);
     FastLED.setCorrection( TypicalLEDStrip );
 
     if(EEPROM.read(0) != 255) {
-        Serial.println("Nothing in EEPROM");
+        syslog.log(LOG_INFO, "Nothing in EEPROM");
         lastBrightness = DEFAULT_BRIGHTNESS;
         ledColorValue = CHSV(0,0,HSV_BRIGHTNESS);
         writeToEEPROM();
     } else {
-        Serial.println("Reading from EEPROM");
+        syslog.log(LOG_INFO, "Reading from EEPROM");
         readFromEEPROM();
     }
     FastLED.setBrightness(0);
@@ -132,11 +147,11 @@ void setup() {
 void readFromEEPROM() {
     lastBrightness = EEPROM.read(1);
     ledColorValue = EEPROM.get(2, ledColorValue);
-    Serial.printf("from eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
+    syslog.logf(LOG_INFO, "from eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
 }
 
 void writeToEEPROM() {
-    Serial.printf("to eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, lastBrightness);
+    syslog.logf(LOG_INFO, "to eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, lastBrightness);
     EEPROM.write(0,255);
     EEPROM.write(1, lastBrightness);
     EEPROM.put(2, ledColorValue);
@@ -172,9 +187,15 @@ void loop() {
             //FastLED.showColor(ledColorValue);
         }
     }
-    EVERY_N_MILLISECONDS_I(SHOW_FPS, 5000) {
-        Serial.printf("FPS: %i\n", FastLED.getFPS());
+    EVERY_N_MINUTES_I(SHOW_FPS, 5) {
+        syslog.logf(LOG_DEBUG, "FPS: %i\n", FastLED.getFPS());
     }
+
+#ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
+    EVERY_N_SECONDS_I(SHOW_RETRYS, 30) {
+        syslog.logf(LOG_DEBUG, "R: %i, F: %i\n", _retry_cnt, _frame_cnt);
+    }
+#endif
 
     EVERY_N_MILLISECONDS_I(NOISE_THING, 10) {
         nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);  // Blend towards the target palette
@@ -213,8 +234,8 @@ void loop() {
 void newTargetPalette() {
     uint8_t ms = 0;
 
-    if(ledColorValue.s > 127) {
-        ms = min(255, ledColorValue.s + 64);
+    if(ledColorValue.s < 127) {
+        ms = min(255, ledColorValue.s + 16);
     } else {
         ms = max(0, ledColorValue.s - 64);
     }
