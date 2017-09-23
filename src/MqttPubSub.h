@@ -41,6 +41,7 @@ public:
             this->mqttCallback(topic,payload,length);
         });
 
+        getRandomClientId();
         String espHostString = espTopidId;
 
         mqttGetBrightnessTopic = espHostString + MQTT_GET_BRIGHTNESS;
