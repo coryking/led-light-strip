@@ -36,13 +36,15 @@ public:
     typedef std::function<uint8_t(void)> GetBrightnessCallback;
 
     MqttPubSub(WiFiClient& wifiClient) {
+        getRandomClientId();
+
+        client.setClient(wifiClient);
         client.setServer(MQTT_SERVER, 1883);
         client.setCallback([this](char* topic, byte* payload, unsigned int length) {
             this->mqttCallback(topic,payload,length);
         });
 
-        getRandomClientId();
-        String espHostString = espTopidId;
+        String espHostString = espTopicId;
 
         mqttGetBrightnessTopic = espHostString + MQTT_GET_BRIGHTNESS;
         mqttGetHueTopic = espHostString + MQTT_GET_HUE;
@@ -80,9 +82,8 @@ private:
     void setSubscriptions();
     bool reconnect();
     char espClientId[20] = {0};
-    char espTopidId[11] = {0};
+    char espTopicId[20] = {0};
     void getRandomClientId();
-
 
     String mqttGetPowerTopic;
     String mqttGetHueTopic;

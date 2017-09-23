@@ -34,6 +34,8 @@ void setupWiFi() {
         Serial.print(".");
         delay(500);
     }
+    IPAddress ip = WiFi.dnsIP(0);
+    Serial.println(ip.toString());
     WiFi.printDiag(Serial);
     Serial.println("");
     syslog.log(LOG_WARNING, "Connected to wifi....");

@@ -86,13 +86,13 @@ void MqttPubSub::loop() {
 
 bool MqttPubSub::reconnect() {
     getRandomClientId();
-    if (client.connect(espClientId)) {
+    if (this->client.connect(espClientId)) {
         // ... and resubscribe
         this->setSubscriptions();
         if(reconnectCallback != NULL)
             reconnectCallback();
     }
-    return client.connected();
+    return this->client.connected();
 }
 
 void MqttPubSub::intRangeToChar(uint16_t in, uint16_t il, uint16_t ih, uint16_t ol, uint16_t oh,char* outBuff) {
@@ -148,10 +148,12 @@ void MqttPubSub::subscribe(String &topic) {
 }
 
 void MqttPubSub::connect() {
+    Serial.println("Connecting to MQTT");
     syslog.logf(LOG_INFO, "Connecting to MQTT");
     int attempts=0;
     while(!this->client.connected() && attempts < 20) {
-        syslog.logf(LOG_DEBUG,"reconnect to mqtt.... (%i)", attempts);
+        Serial.printf("Connecting to MQTT (%i)\n", attempts);
+        syslog.logf(LOG_DEBUG,"re-conn. (%i)\n", attempts);
         this->reconnect();
 
         attempts++;
@@ -165,6 +167,8 @@ void MqttPubSub::setReconnectCallback(const MqttPubSub::ReconnectCallback reconn
 }
 
 void MqttPubSub::getRandomClientId() {
-    sprintf(espTopidId, "ESP_%06X", ESP.getChipId());
-    sprintf(espClientId, "ESP_%06X_%04X", ESP.getChipId(), random(0,65535));
+    sprintf(espTopicId, "ESP_%06X", ESP.getChipId());
+    sprintf(espClientId, "%s_%04X", espTopicId, random(0,65535));
+    Serial.printf("CID:[%s]",espClientId);
+    syslog.logf(LOG_INFO, "CID:[%s]",espClientId);
 }

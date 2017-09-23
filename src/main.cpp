@@ -42,7 +42,6 @@ uint8_t  lastBrightness = 0;
 
 WiFiClient espClient;
 MqttPubSub mqttPubSub(espClient);
-
 CRGBPalette16 targetPalette = CRGBPalette16(ledColorValue);
 
 WiFiUDP udpClient;
@@ -108,12 +107,13 @@ void setup() {
     Serial.println();
     Serial.println(hostString);
     setupWiFi();
-    ArduinoOTA.begin();
-
     syslog.server(SYSLOG_SERVER, SYSLOG_PORT);
     syslog.deviceHostname(hostString);
     syslog.appName(APP_NAME);
     syslog.defaultPriority(LOG_DAEMON);
+    syslog.logf(LOG_WARNING, "Hello from [%s]\n", hostString);
+    Serial.printf("Hello from [%s]\n", hostString);
+    ArduinoOTA.begin();
 
     FastLED.addLeds<SK6812, DATA_PIN, GRB>(leds, NUM_LEDS);
     FastLED.setCorrection( TypicalLEDStrip );
@@ -137,11 +137,13 @@ void setup() {
         ->setLightPowerCallback(setPowerCb);
 
     mqttPubSub.setReconnectCallback(didConnectMQTT);
+    Serial.println("Gonna connect");
     mqttPubSub.connect();
-
     if (!MDNS.begin(hostString)) {
         Serial.println("Error setting up MDNS responder!");
     }
+    Serial.println("Done with setup!");
+
 
 }
 
@@ -159,11 +161,30 @@ void writeToEEPROM() {
     EEPROM.commit();
 }
 
+void logStats(uint64_t numLoops) {
+    static uint64_t lastLoopCnt = 0;
+    static ulong  lastMillis = 0;
+
+    auto curMillis = millis();
+    auto dur = (curMillis - lastMillis) / 1000;
+    lastMillis = curMillis;
+
+    uint64_t lps = numLoops - lastLoopCnt;
+    lastLoopCnt = numLoops;
+
+    syslog.logf(LOG_DEBUG, "L:%i NL:%i D:%i \n", lps,numLoops,dur);
+    syslog.logf(LOG_DEBUG, "LR: %i\n", lps/dur);
+}
+
 void loop() {
     static uint16_t  dist;
     static uint16_t  scale=30;
     static uint8_t maxChanges = 48;
+    static uint64_t numLoops = 0;
+
     static CRGBPalette16 currentPalette = CRGBPalette16(CRGB::Black);
+
+    numLoops++;
 
     mqttPubSub.loop();
     EVERY_N_MILLISECONDS(1000 / FRAMES_PER_SECOND) {
@@ -190,6 +211,8 @@ void loop() {
     }
     EVERY_N_SECONDS_I(SHOW_FPS, 10) {
         syslog.logf(LOG_DEBUG, "F: %i\n", FastLED.getFPS());
+
+        logStats(numLoops);
     }
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
