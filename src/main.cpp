@@ -6,6 +6,7 @@
 //#define DEBUG_ESP_OTA
 //#define DEBUG_ESP_PORT Serial
 #define OTA_DEBUG Serial
+#define DEBUGV Serial.println
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <FastLED.h>
@@ -13,9 +14,11 @@
 #include "MqttPubSub.h"
 #include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
+#include <Task.h>
 #include <WiFiUdp.h>
 #include <Syslog.h>
 #include "config.h"
+
 
 
 // How many leds in your strip?
@@ -47,6 +50,10 @@ CRGBPalette16 targetPalette = CRGBPalette16(ledColorValue);
 WiFiUDP udpClient;
 Syslog syslog(udpClient, SYSLOG_PROTO_BSD);
 
+TaskManager taskManager;
+
+ulong numLoops = 0;
+CRGBPalette16 currentPalette = CRGBPalette16(CRGB::Black);
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
 extern uint32_t _frame_cnt;
@@ -60,11 +67,32 @@ long lastWifiReconnectAttempt = 0;
 void readFromEEPROM();
 void writeToEEPROM();
 
-void newTargetPalette();
+void newTargetPalette(uint32_t deltaTime);
+FunctionTask taskNewTargetPalette(newTargetPalette, MsToTaskTime(5000));
+
+void managePower(uint32_t deltaTime);
+FunctionTask taskManagePower(managePower, MsToTaskTime(1000 / FRAMES_PER_SECOND));
+
+void showStats(uint32_t deltaTime);
+FunctionTask taskShowStats(showStats, MsToTaskTime(10000));
+
+void showRetries(uint32_t deltaTime);
+FunctionTask taskShowRetries(showRetries, MsToTaskTime(30000));
+
+void onMonitorWifi(uint32_t deltaTime);
+FunctionTask taskMonitorWifi(onMonitorWifi, MsToTaskTime(1000));
+
+void updateNoise(uint32_t deltaTime);
+
+void onHandleMqtt(uint32_t deltaTime);
+FunctionTask taskHandleMqtt(onHandleMqtt, MsToTaskTime(10));
+
+void onHandleOTA(uint32_t deltaTime);
+FunctionTask taskHandleOTA(onHandleOTA, MsToTaskTime(11));
 
 void showNewColor() {
     Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
-    newTargetPalette();
+    newTargetPalette(0);
     writeToEEPROM();
 }
 
@@ -144,6 +172,15 @@ void setup() {
     }
     Serial.println("Done with setup!");
 
+    taskManager.StartTask(&taskManagePower);
+    taskManager.StartTask(&taskNewTargetPalette);
+#ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
+    taskManager.StartTask(&taskShowRetries);
+#endif
+    taskManager.StartTask(&taskShowStats);
+    taskManager.StartTask(&taskMonitorWifi);
+    taskManager.StartTask(&taskHandleMqtt);
+    taskManager.StartTask(&taskHandleOTA);
 
 }
 
@@ -161,34 +198,62 @@ void writeToEEPROM() {
     EEPROM.commit();
 }
 
-void logStats(uint64_t numLoops) {
-    static uint64_t lastLoopCnt = 0;
-    static ulong  lastMillis = 0;
-
-    auto curMillis = millis();
-    auto dur = (curMillis - lastMillis) / 1000;
-    lastMillis = curMillis;
-
-    uint64_t lps = numLoops - lastLoopCnt;
-    lastLoopCnt = numLoops;
-
-    syslog.logf(LOG_DEBUG, "L:%i NL:%i D:%i \n", lps,numLoops,dur);
-    syslog.logf(LOG_DEBUG, "LR: %i\n", lps/dur);
+void loop() {
+    ++numLoops;
+    taskManager.Loop();
+    yield();
 }
 
-void loop() {
+void onHandleMqtt(uint32_t deltaTime) { mqttPubSub.loop(); }
+void onHandleOTA(uint32_t deltaTime) {
+    ArduinoOTA.handle();
+}
+void onMonitorWifi(uint32_t deltaTime) {
+    if(WiFi.status() != WL_CONNECTED) {
+
+        Serial.println("Attempting to reconnect to Wifi");
+        // Attempt to reconnect
+        reconnectWiFi();
+
+        if (WiFi.status() == WL_CONNECTED) {
+            Serial.println("Reconnected to Wifi");
+            syslog.log(LOG_WARNING, "Reconnected to wifi....");
+            ArduinoOTA.begin();
+        }
+    }
+}
+
+void updateNoise(uint32_t deltaTime) {
     static uint16_t  dist;
     static uint16_t  scale=30;
     static uint8_t maxChanges = 48;
-    static uint64_t numLoops = 0;
+    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);  // Blend towards the target palette
+    for(int i = 0; i < NUM_LEDS; i++) {                                      // Just ONE loop to fill up the LED array as all of the pixels change.
+            uint8_t index = inoise8(i*scale, dist+i*scale) % 255;                  // Get a value from the noise function. I'm using both x and y axis.
+            leds[i] = ColorFromPalette(currentPalette, index, 255, LINEARBLEND);   // With that value, look up the 8 bit colour palette value and assign it to the current LED.
+        }
+    dist += beatsin8(10,1, 4);                                               // Moving along the distance (that random number we started out with). Vary it a bit with a sine wave.
+    // In some sketches, I've used millis() instead of an incremented counter. Works a treat.
+}
 
-    static CRGBPalette16 currentPalette = CRGBPalette16(CRGB::Black);
+void showRetries(uint32_t deltaTime) { syslog.logf(LOG_DEBUG, "R: %i, F: %i\n", _retry_cnt, _frame_cnt); }
 
-    numLoops++;
+void showStats(uint32_t deltaTime) {
 
-    mqttPubSub.loop();
-    EVERY_N_MILLISECONDS(1000 / FRAMES_PER_SECOND) {
-        if(powerState == POWERING_ON) {
+    static ulong lastLoopCnt = 0;
+    static char lb[100] = {0};
+    syslog.logf(LOG_DEBUG, "F: %i\n", FastLED.getFPS());
+
+    ulong dur = deltaTime / 1000;
+    ulong lps = numLoops - lastLoopCnt;
+    lastLoopCnt = numLoops;
+    sprintf(lb, "L:%i NL:%i LPS:%u DUR:%u", lps, numLoops,lps/dur,dur);
+    syslog.log(LOG_DEBUG, lb);
+    Serial.println(lb);
+}
+
+void managePower(uint32_t deltaTime) {
+    if(powerState == POWERING_ON) {
             uint8_t brightness = lastBrightness == 0 ? DEFAULT_BRIGHTNESS : lastBrightness;
             FastLED.setBrightness(brightness);
             lastBrightness = brightness;
@@ -197,67 +262,23 @@ void loop() {
             mqttPubSub.publishHSV(ledColorValue);
             mqttPubSub.publishBrightness(brightness);
         }
-        if(powerState == POWERING_OFF) {
+    if(powerState == POWERING_OFF) {
             lastBrightness = (FastLED.getBrightness() == 0) ? lastBrightness : FastLED.getBrightness();
             FastLED.setBrightness(0);
-            FastLED.showColor(CHSV(0,0,0));
+            FastLED.showColor(CHSV(0, 0, 0));
             powerState = POWERED_OFF;
             mqttPubSub.publishPower(false);
         }
-        if(powerState == POWER_ON) {
+    if(powerState == POWER_ON) {
+            updateNoise(deltaTime);
             FastLED.show();
             //FastLED.showColor(ledColorValue);
         }
-    }
-    EVERY_N_SECONDS_I(SHOW_FPS, 10) {
-        syslog.logf(LOG_DEBUG, "F: %i\n", FastLED.getFPS());
-
-        logStats(numLoops);
-    }
-
-#ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
-    EVERY_N_SECONDS_I(SHOW_RETRYS, 30) {
-        syslog.logf(LOG_DEBUG, "R: %i, F: %i\n", _retry_cnt, _frame_cnt);
-    }
-#endif
-
-    EVERY_N_MILLISECONDS_I(NOISE_THING, 10) {
-        nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);  // Blend towards the target palette
-        for(int i = 0; i < NUM_LEDS; i++) {                                      // Just ONE loop to fill up the LED array as all of the pixels change.
-            uint8_t index = inoise8(i*scale, dist+i*scale) % 255;                  // Get a value from the noise function. I'm using both x and y axis.
-            leds[i] = ColorFromPalette(currentPalette, index, 255, LINEARBLEND);   // With that value, look up the 8 bit colour palette value and assign it to the current LED.
-        }
-        dist += beatsin8(10,1, 4);                                               // Moving along the distance (that random number we started out with). Vary it a bit with a sine wave.
-        // In some sketches, I've used millis() instead of an incremented counter. Works a treat.
-    }
-
-    EVERY_N_SECONDS_I(CHANGE_PALETTE, 5) {             // Change the target palette to a random one every 5 seconds.
-        newTargetPalette();
-    }
-
-
-    if(WiFi.status() != WL_CONNECTED) {
-        long now = millis();
-        if (now - lastWifiReconnectAttempt > 5000) {
-            lastWifiReconnectAttempt = now;
-            // Attempt to reconnect
-            reconnectWiFi();
-
-            if (WiFi.status() == WL_CONNECTED) {
-                syslog.log(LOG_WARNING, "Reconnected to wifi....");
-
-                lastWifiReconnectAttempt = 0;
-                ArduinoOTA.begin();
-            }
-        }
-    }
-
-    ArduinoOTA.handle();
-    yield();
 }
+
 #define max(a,b) ((a)>(b)?(a):(b))
 #define min(a,b) ((a)<(b)?(a):(b))
-void newTargetPalette() {
+void newTargetPalette(uint32_t deltaTime) {
     uint8_t ms = 0;
 
     if(ledColorValue.s < 127) {
