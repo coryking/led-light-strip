@@ -67,34 +67,6 @@ void MqttPubSub::setSubscriptions() {
 }
 
 
-void MqttPubSub::loop() {
-
-    if (!this->client.loop()) {
-        ulong now = millis();
-        if (now - lastReconnectAttempt > 5000) {
-            lastReconnectAttempt = now;
-            // Attempt to reconnect
-            syslog.logf(LOG_INFO, "MQTT rct (%i)", client.state());
-            if (this->reconnect()) {
-                syslog.log(LOG_INFO, "MQTT conn!");
-                lastReconnectAttempt = 0;
-            }
-        }
-    }
-
-}
-
-bool MqttPubSub::reconnect() {
-    getRandomClientId();
-    if (this->client.connect(espClientId)) {
-        // ... and resubscribe
-        this->setSubscriptions();
-        if(reconnectCallback != NULL)
-            reconnectCallback();
-    }
-    return this->client.connected();
-}
-
 void MqttPubSub::intRangeToChar(uint16_t in, uint16_t il, uint16_t ih, uint16_t ol, uint16_t oh,char* outBuff) {
     itoa(map(in, il, ih, ol, oh), outBuff, 10);
 }
@@ -130,36 +102,33 @@ void MqttPubSub::setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, byte *
     message_buff[i] = '\0';
     if(cb != NULL) {
         uint32_t intMsg = map(atoi(message_buff), ol, oh, 0, 255);
-        syslog.logf(LOG_DEBUG, "Payload value was: '%i'", intMsg);
+        syslog.logf(LOG_DEBUG, "pv: '%i'", intMsg);
 
         cb(intMsg);
     }
 }
 
 void MqttPubSub::publish(String &topic, const char* value) {
-    syslog.logf(LOG_INFO, "pub: [%s] to '%s'\n", value, topic.c_str());
-    this->client.publish(topic.c_str(), value);
+    if(this->mqttState == Connected) {
+        syslog.logf(LOG_INFO, "p: [%s] '%s'\n", value, topic.c_str());
+        this->client->publish(topic.c_str(), value);
+        yield();
+        this->client->loop();
+        yield();
+    } else {
+        syslog.logf(LOG_INFO, "ig: [%s] '%s'\n", value, topic.c_str());
+    }
 
 }
 
 void MqttPubSub::subscribe(String &topic) {
-    syslog.logf(LOG_INFO, "Subscribing to '%s'\n", topic.c_str());
-    this->client.subscribe(topic.c_str());
-}
+    if(this->mqttState == Connected) {
+        syslog.logf(LOG_INFO, "sub '%s'\n", topic.c_str());
+        this->client->subscribe(topic.c_str());
+    } else {
+        syslog.logf(LOG_INFO, "ignore '%s'\n", topic.c_str());
 
-void MqttPubSub::connect() {
-    Serial.println("Connecting to MQTT");
-    syslog.logf(LOG_INFO, "Connecting to MQTT");
-    int attempts=0;
-    while(!this->client.connected() && attempts < 20) {
-        Serial.printf("Connecting to MQTT (%i)\n", attempts);
-        syslog.logf(LOG_DEBUG,"re-conn. (%i)\n", attempts);
-        this->reconnect();
-
-        attempts++;
-        delay(100);
     }
-    syslog.logf(LOG_INFO, "Connected to MQTT...");
 }
 
 void MqttPubSub::setReconnectCallback(const MqttPubSub::ReconnectCallback reconnectCallback) {
@@ -171,4 +140,66 @@ void MqttPubSub::getRandomClientId() {
     sprintf(espClientId, "%s_%04X", espTopicId, random(0,65535));
     Serial.printf("CID:[%s]",espClientId);
     syslog.logf(LOG_INFO, "CID:[%s]",espClientId);
+}
+
+void MqttPubSub::makePubSubClient() {
+    if(client != NULL)
+        delete client;
+
+    client = new PubSubClient();
+    client->setClient(wifiClient);
+    client->setServer(MQTT_SERVER, 1883);
+    client->setCallback([this](char* topic, byte* payload, unsigned int length) {
+        this->mqttCallback(topic,payload,length);
+    });
+
+
+}
+
+void MqttPubSub::OnUpdate(uint32_t deltaTime) {
+    Task::OnUpdate(deltaTime);
+
+    if(this->client == NULL || this->mqttState == Disconnecting)
+    {
+        this->wifiClient.stop();
+        syslog.logf(LOG_WARNING, "To Mqtt Disconnected");
+        this->mqttState = Disconnected;
+    }
+
+    if(this->mqttState == Disconnected) {
+        syslog.logf(LOG_WARNING, "To Mqtt Waiting...");
+        this->getRandomClientId();
+        this->makePubSubClient();
+        this->timeWaitStarted = millis();
+        this->mqttState = Waiting;
+    }
+
+    if(this->mqttState == Waiting) {
+        if(millis() > this->timeWaitStarted + MQTT_CONNECT_WAIT)
+        {
+            syslog.logf(LOG_WARNING, "To Mqtt Connecting...");
+            this->mqttState = Connecting;
+
+        }
+    }
+
+    if(this->mqttState == Connecting) {
+        if(this->client->connect(espClientId)) {
+            syslog.logf(LOG_WARNING, "To Mqtt Connected...");
+            this->mqttState = Connected;
+
+            // ... and resubscribe
+            this->setSubscriptions();
+            if(reconnectCallback != NULL)
+                reconnectCallback();
+        }
+    }
+
+    if(this->mqttState == Connected) {
+        if(!this->client->loop())
+        {
+            this->mqttState = Disconnecting;
+        }
+    }
+
 }

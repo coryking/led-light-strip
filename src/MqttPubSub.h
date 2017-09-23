@@ -9,6 +9,8 @@
 
 #include <FastLED.h>
 
+#include <Task.h>
+
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
@@ -24,7 +26,18 @@
 #define MQTT_SET_BRIGHTNESS "/lightbulb/brightness"
 #define MQTT_SET_SATURATION "/lightbulb/saturation"
 
-class MqttPubSub {
+// how long to wait for MQTT to settle before trying to connect
+#define MQTT_CONNECT_WAIT 6000
+
+enum MQTT_STATE {
+    Disconnecting,
+    Disconnected,
+    Waiting,
+    Connecting,
+    Connected
+};
+
+class MqttPubSub : public Task {
 
 public:
     typedef std::function<void(void)> ReconnectCallback;
@@ -35,14 +48,8 @@ public:
     typedef std::function<CHSV(void)> GetHSVCallback;
     typedef std::function<uint8_t(void)> GetBrightnessCallback;
 
-    MqttPubSub(WiFiClient& wifiClient) {
+    MqttPubSub() : Task(MsToTaskTime(100)) {
         getRandomClientId();
-
-        client.setClient(wifiClient);
-        client.setServer(MQTT_SERVER, 1883);
-        client.setCallback([this](char* topic, byte* payload, unsigned int length) {
-            this->mqttCallback(topic,payload,length);
-        });
 
         String espHostString = espTopicId;
 
@@ -74,16 +81,18 @@ public:
 
     void setReconnectCallback(const ReconnectCallback reconnectCallback);
 
-    void connect();
-    void loop();
+    virtual void OnUpdate(uint32_t deltaTime);
+
 private:
-    PubSubClient client;
-    ulong lastReconnectAttempt = 0;
+    PubSubClient *client;
+    WiFiClient wifiClient;
+    ulong timeWaitStarted = 0;
     void setSubscriptions();
-    bool reconnect();
     char espClientId[20] = {0};
     char espTopicId[20] = {0};
     void getRandomClientId();
+    void makePubSubClient();
+    MQTT_STATE mqttState = Disconnected;
 
     String mqttGetPowerTopic;
     String mqttGetHueTopic;

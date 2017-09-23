@@ -43,8 +43,7 @@ CHSV ledColorValue = CHSV(0,0,HSV_BRIGHTNESS);
 PowerState powerState = POWERING_OFF;
 uint8_t  lastBrightness = 0;
 
-WiFiClient espClient;
-MqttPubSub mqttPubSub(espClient);
+MqttPubSub mqttPubSub;
 CRGBPalette16 targetPalette = CRGBPalette16(ledColorValue);
 
 WiFiUDP udpClient;
@@ -83,9 +82,6 @@ void onMonitorWifi(uint32_t deltaTime);
 FunctionTask taskMonitorWifi(onMonitorWifi, MsToTaskTime(1000));
 
 void updateNoise(uint32_t deltaTime);
-
-void onHandleMqtt(uint32_t deltaTime);
-FunctionTask taskHandleMqtt(onHandleMqtt, MsToTaskTime(10));
 
 void onHandleOTA(uint32_t deltaTime);
 FunctionTask taskHandleOTA(onHandleOTA, MsToTaskTime(11));
@@ -166,7 +162,6 @@ void setup() {
 
     mqttPubSub.setReconnectCallback(didConnectMQTT);
     Serial.println("Gonna connect");
-    mqttPubSub.connect();
     if (!MDNS.begin(hostString)) {
         Serial.println("Error setting up MDNS responder!");
     }
@@ -179,7 +174,7 @@ void setup() {
 #endif
     taskManager.StartTask(&taskShowStats);
     taskManager.StartTask(&taskMonitorWifi);
-    taskManager.StartTask(&taskHandleMqtt);
+    taskManager.StartTask(&mqttPubSub);
     taskManager.StartTask(&taskHandleOTA);
 
 }
@@ -204,7 +199,6 @@ void loop() {
     yield();
 }
 
-void onHandleMqtt(uint32_t deltaTime) { mqttPubSub.loop(); }
 void onHandleOTA(uint32_t deltaTime) {
     ArduinoOTA.handle();
 }
