@@ -188,8 +188,8 @@ void loop() {
             //FastLED.showColor(ledColorValue);
         }
     }
-    EVERY_N_MINUTES_I(SHOW_FPS, 5) {
-        syslog.logf(LOG_DEBUG, "FPS: %i\n", FastLED.getFPS());
+    EVERY_N_SECONDS_I(SHOW_FPS, 10) {
+        syslog.logf(LOG_DEBUG, "F: %i\n", FastLED.getFPS());
     }
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
@@ -221,6 +221,8 @@ void loop() {
             reconnectWiFi();
 
             if (WiFi.status() == WL_CONNECTED) {
+                syslog.log(LOG_WARNING, "Reconnected to wifi....");
+
                 lastWifiReconnectAttempt = 0;
                 ArduinoOTA.begin();
             }

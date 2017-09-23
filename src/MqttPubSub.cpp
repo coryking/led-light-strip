@@ -69,26 +69,24 @@ void MqttPubSub::setSubscriptions() {
 
 void MqttPubSub::loop() {
 
-    if (!this->client.connected()) {
+    if (!this->client.loop()) {
         ulong now = millis();
         if (now - lastReconnectAttempt > 5000) {
             lastReconnectAttempt = now;
             // Attempt to reconnect
-            syslog.log(LOG_INFO, "Attempting to reconnect to MQTT");
+            syslog.logf(LOG_INFO, "MQTT rct (%i)", client.state());
             if (this->reconnect()) {
-                syslog.log(LOG_INFO, "Successful attempt to reconnect to MQTT!");
+                syslog.log(LOG_INFO, "MQTT conn!");
                 lastReconnectAttempt = 0;
             }
         }
-    } else {
-        // Client connected
-        this->client.loop();
     }
 
 }
 
 bool MqttPubSub::reconnect() {
-    if (client.connect(this->espHostString.c_str())) {
+    getRandomClientId();
+    if (client.connect(espClientId)) {
         // ... and resubscribe
         this->setSubscriptions();
         if(reconnectCallback != NULL)
@@ -164,4 +162,9 @@ void MqttPubSub::connect() {
 
 void MqttPubSub::setReconnectCallback(const MqttPubSub::ReconnectCallback reconnectCallback) {
     MqttPubSub::reconnectCallback = reconnectCallback;
+}
+
+void MqttPubSub::getRandomClientId() {
+    sprintf(espTopidId, "ESP_%06X", ESP.getChipId());
+    sprintf(espClientId, "ESP_%06X_%04X", ESP.getChipId(), random(0,65535));
 }

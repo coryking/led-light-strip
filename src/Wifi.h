@@ -36,6 +36,7 @@ void setupWiFi() {
     }
     WiFi.printDiag(Serial);
     Serial.println("");
+    syslog.log(LOG_WARNING, "Connected to wifi....");
     Serial.println("WiFi connected");
 }
 

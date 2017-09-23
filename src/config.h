@@ -10,7 +10,7 @@
 #define YOUR_WIFI_SSID "Cats Drinking Wine"
 #define YOUR_WIFI_PASSWD "catsmeow"
 
-#define MQTT_SERVER "192.168.3.3"
+#define MQTT_SERVER "mqtt.gotokingfamily.com"
 
 // Syslog server connection info
 #define SYSLOG_SERVER "192.168.1.85"
