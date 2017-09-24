@@ -5,7 +5,7 @@
 #include "RandomPattern.h"
 
 uint16_t RandomPattern::readFrame(CRGB *buffer, ulong time) {
-    if(!gCurrentPattern) gCurrentPattern = nextPattern();
+    if(gCurrentPattern == NULL) gCurrentPattern = nextPattern();
 
     // Call the current pattern function once, updating the 'leds' array
     gCurrentPattern->readFrame(buffer, time);

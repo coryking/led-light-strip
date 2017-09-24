@@ -16,11 +16,13 @@
 #include <WiFiClient.h>
 #include "config.h"
 
+#define MQTT_GET_RANDOM "/lightbulb/random/get"
 #define MQTT_GET_POWER "/lightbulb/power/get"
 #define MQTT_GET_HUE "/lightbulb/hue/get"
 #define MQTT_GET_BRIGHTNESS "/lightbulb/brightness/get"
 #define MQTT_GET_SATURATION "/lightbulb/saturation/get"
 
+#define MQTT_SET_RANDOM "/lightbulb/random"
 #define MQTT_SET_POWER "/lightbulb/power"
 #define MQTT_SET_HUE "/lightbulb/hue"
 #define MQTT_SET_BRIGHTNESS "/lightbulb/brightness"
@@ -57,11 +59,15 @@ public:
         mqttGetHueTopic = espHostString + MQTT_GET_HUE;
         mqttGetSaturationTopic = espHostString + MQTT_GET_SATURATION;
         mqttGetPowerTopic = espHostString + MQTT_GET_POWER;
+        mqttGetRandomTopic = espHostString + MQTT_GET_RANDOM;
+
 
         mqttSetBrightnessTopic = espHostString + MQTT_SET_BRIGHTNESS;
         mqttSetSaturationTopic = espHostString + MQTT_SET_SATURATION;
         mqttSetHueTopic = espHostString + MQTT_SET_HUE;
         mqttSetPowerTopic = espHostString + MQTT_SET_POWER;
+        mqttSetRandomTopic = espHostString + MQTT_SET_RANDOM;
+
 
     }
 
@@ -71,6 +77,8 @@ public:
 
     void publishPower(const bool isOn);
 
+    void publishRandom(const bool isRandomMode);
+
     MqttPubSub* setLightSaturationCallback(const IntValueCallback lightSaturationCallback);
 
     MqttPubSub* setLightBrightnessCallback(const IntValueCallback lightBrightnessCallback);
@@ -78,6 +86,8 @@ public:
     MqttPubSub* setLightHueCallback(const IntValueCallback lightHueCallback);
 
     MqttPubSub* setLightPowerCallback(const PowerCallback lightPowerCallback);
+
+    MqttPubSub* setLightRandomCallback(const PowerCallback lightRandomCallback);
 
     void setReconnectCallback(const ReconnectCallback reconnectCallback);
 
@@ -94,11 +104,13 @@ private:
     void makePubSubClient();
     MQTT_STATE mqttState = Disconnected;
 
+    String mqttGetRandomTopic;
     String mqttGetPowerTopic;
     String mqttGetHueTopic;
     String mqttGetBrightnessTopic;
     String mqttGetSaturationTopic;
 
+    String mqttSetRandomTopic;
     String mqttSetPowerTopic;
     String mqttSetHueTopic;
     String mqttSetBrightnessTopic;
@@ -108,6 +120,8 @@ private:
     IntValueCallback lightBrightnessCallback;
     IntValueCallback lightHueCallback;
     PowerCallback lightPowerCallback;
+    PowerCallback lightRandomCallback;
+
 
     ReconnectCallback reconnectCallback;
 

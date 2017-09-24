@@ -10,17 +10,19 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <FastLED.h>
-#include "Wifi.h"
-#include "MqttPubSub.h"
 #include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
 #include <Task.h>
 #include <WiFiUdp.h>
 #include <Syslog.h>
-#include "config.h"
 
-#include "animations/RandomPattern.h"
+#include "Wifi.h"
+#include "config.h"
 #include "animations/FancyLight.h"
+#include "animations/RandomPattern.h"
+#include "MqttPubSub.h"
+
+
 
 
 // How many leds in your strip?
@@ -32,7 +34,6 @@
 #define DATA_PIN 4
 
 #define DEFAULT_BRIGHTNESS 127
-#define HSV_BRIGHTNESS 255
 
 #define FRAMES_PER_SECOND  60
 
@@ -54,8 +55,16 @@ TaskManager taskManager;
 
 ulong numLoops = 0;
 
-FancyLight* fancyLightPattern;
-RandomPattern* randomPattern;
+enum LightPattern {
+    FancyLightPattern=0,
+    RandomLightPattern=1
+};
+
+LightPattern lightPattern = FancyLightPattern;
+
+FancyLight fancyLightPattern(NUM_LEDS);
+RandomPattern randomPattern(NUM_LEDS);
+AbstractPattern* currentPattern;
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
 extern uint32_t _frame_cnt;
@@ -82,16 +91,30 @@ void onMonitorWifi(uint32_t deltaTime);
 FunctionTask taskMonitorWifi(onMonitorWifi, MsToTaskTime(1000));
 
 void onHandleOTA(uint32_t deltaTime);
+
+void setLightPattern();
+
 FunctionTask taskHandleOTA(onHandleOTA, MsToTaskTime(11));
 
 void showNewColor() {
     Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
-    if(fancyLightPattern != NULL) {
-        fancyLightPattern->setHue(ledColorValue.h);
-        fancyLightPattern->setSaturation(ledColorValue.s);
-        fancyLightPattern->changePalette();
-    }
+    fancyLightPattern.setHue(ledColorValue.h);
+    fancyLightPattern.setSaturation(ledColorValue.s);
+    fancyLightPattern.changePalette();
+    setLightPattern();
     writeToEEPROM();
+}
+
+void setLightPattern() {
+    switch(lightPattern) {
+        case FancyLightPattern:
+            currentPattern = &fancyLightPattern;
+            break;
+        case RandomLightPattern:
+            currentPattern = &randomPattern;
+            break;
+    }
+    Serial.println(currentPattern != NULL);
 }
 
 void setHueCb(uint8_t h) {
@@ -120,10 +143,17 @@ void setPowerCb(bool power) {
 
 }
 
+void setRandomCb(bool randomState) {
+    lightPattern = randomState ? LightPattern::RandomLightPattern : LightPattern::FancyLightPattern;
+    showNewColor();
+}
+
+
 void didConnectMQTT() {
     mqttPubSub.publishBrightness(FastLED.getBrightness());
     mqttPubSub.publishPower(powerState == POWER_ON);
     mqttPubSub.publishHSV(ledColorValue);
+    mqttPubSub.publishRandom(lightPattern == LightPattern::RandomLightPattern ? true : false);
 }
 
 void setup() {
@@ -169,8 +199,7 @@ void setup() {
     }
     Serial.println("Done with setup!");
 
-    fancyLightPattern = new FancyLight(NUM_LEDS);
-
+    setLightPattern();
     taskManager.StartTask(&taskManagePower);
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
     taskManager.StartTask(&taskShowRetries);
@@ -185,6 +214,7 @@ void setup() {
 void readFromEEPROM() {
     lastBrightness = EEPROM.read(1);
     ledColorValue = EEPROM.get(2, ledColorValue);
+    lightPattern = EEPROM.get(3, lightPattern);
     syslog.logf(LOG_INFO, "from eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
 }
 
@@ -193,6 +223,7 @@ void writeToEEPROM() {
     EEPROM.write(0,255);
     EEPROM.write(1, lastBrightness);
     EEPROM.put(2, ledColorValue);
+    EEPROM.put(3, lightPattern);
     EEPROM.commit();
 }
 
@@ -254,7 +285,7 @@ void managePower(uint32_t deltaTime) {
             mqttPubSub.publishPower(false);
         }
     if(powerState == POWER_ON) {
-            fancyLightPattern->readFrame(leds,millis());
+            currentPattern->readFrame(leds,millis());
             FastLED.show();
             //FastLED.showColor(ledColorValue);
         }

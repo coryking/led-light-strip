@@ -6,7 +6,7 @@
 #include "Noise.h"
 
 uint16_t Noise::readFrame(CRGB *buffer, ulong time) {
-    EVERY_N_MILLISECONDS(10) {
+    EVERY_N_MILLISECONDS_I(NOISE_READ_FRAME, 10) {
         nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);  // Blend towards the target palette
         for(int i = 0; i < getNumLeds(); i++) {                                      // Just ONE loop to fill up the LED array as all of the pixels change.
             uint8_t index = inoise8(i*scale, dist+i*scale) % 255;                  // Get a value from the noise function. I'm using both x and y axis.
@@ -16,7 +16,7 @@ uint16_t Noise::readFrame(CRGB *buffer, ulong time) {
         // In some sketches, I've used millis() instead of an incremented counter. Works a treat.
     }
 
-    EVERY_N_SECONDS(5) {             // Change the target palette to a random one every 5 seconds.
+    EVERY_N_SECONDS_I(NOISE_READ_FRAME_PALETTE, 5) {             // Change the target palette to a random one every 5 seconds.
         targetPalette = CRGBPalette16(
                 CHSV(random8(), 255, random8(128,255)),
                 CHSV(random8(), 255, random8(128,255)),

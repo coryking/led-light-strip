@@ -25,6 +25,13 @@ void MqttPubSub::mqttCallback(char *topic, byte *payload, unsigned int length) {
     if (theTopic == mqttSetBrightnessTopic) {
         setPayloadToIntCb(lightBrightnessCallback, payload, length, 0, 100);
     }
+    if (theTopic == mqttSetRandomTopic && lightRandomCallback != NULL) {
+        if ( length > 0 && payload[0] == 't') {
+            lightRandomCallback(true);
+        } else {
+            lightRandomCallback(false);
+        }
+    }
     if (theTopic == mqttSetPowerTopic && lightPowerCallback != NULL) {
         if ( length > 0 && payload[0] == 't') {
             lightPowerCallback(true);
@@ -35,11 +42,7 @@ void MqttPubSub::mqttCallback(char *topic, byte *payload, unsigned int length) {
 }
 
 void MqttPubSub::publishPower(const bool isOn) {
-    if (isOn) {
-        publish(mqttGetPowerTopic, "true");
-    } else {
-        publish(mqttGetPowerTopic, "false");
-    }
+    publish(mqttGetPowerTopic, isOn ? "true" : "false");
 }
 
 void MqttPubSub::publishBrightness(const uint8_t brightness) {
@@ -58,12 +61,17 @@ void MqttPubSub::publishHSV(const CHSV &hsv) {
 }
 
 
+void MqttPubSub::publishRandom(const bool isRandomMode) {
+    publish(mqttGetRandomTopic, isRandomMode ? "true" : "false");
+}
+
 void MqttPubSub::setSubscriptions() {
 
     subscribe(mqttSetPowerTopic);
     subscribe(mqttSetHueTopic);
     subscribe(mqttSetBrightnessTopic);
     subscribe(mqttSetSaturationTopic);
+    subscribe(mqttSetRandomTopic);
 }
 
 
@@ -91,6 +99,11 @@ MqttPubSub*  MqttPubSub::setLightPowerCallback(MqttPubSub::PowerCallback lightPo
     return this;
 }
 
+
+MqttPubSub *MqttPubSub::setLightRandomCallback(const MqttPubSub::PowerCallback lightRandomCallback) {
+    MqttPubSub::lightRandomCallback = lightRandomCallback;
+    return this;
+}
 
 void MqttPubSub::setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, byte *payload, unsigned int length, int ol, int oh) {
     char message_buff[100] = {0};

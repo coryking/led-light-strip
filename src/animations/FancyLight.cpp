@@ -14,7 +14,7 @@ uint16_t FancyLight::readFrame(CRGB *buffer, ulong time) {
     dist += beatsin8(10,1, 4);                                               // Moving along the distance (that random number we started out with). Vary it a bit with a sine wave.
     // In some sketches, I've used millis() instead of an incremented counter. Works a treat.
 
-    EVERY_N_SECONDS(5) {             // Change the target palette to a random one every 5 seconds.
+    EVERY_N_SECONDS_I(FANCYLIGHT_CHANGEL_PALETTE, 5) {             // Change the target palette to a random one every 5 seconds.
         changePalette();
 
     }
