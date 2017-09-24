@@ -118,6 +118,7 @@ private:
     void subscribe(String& topic);
 
 
+    void toWaiting();
 };
 
 #endif //RGBWPLAY_MQTTPUBSUB_H

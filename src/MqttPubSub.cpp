@@ -167,11 +167,9 @@ void MqttPubSub::OnUpdate(uint32_t deltaTime) {
     }
 
     if(this->mqttState == Disconnected) {
-        syslog.logf(LOG_WARNING, "To Mqtt Waiting...");
         this->getRandomClientId();
         this->makePubSubClient();
-        this->timeWaitStarted = millis();
-        this->mqttState = Waiting;
+        toWaiting();
     }
 
     if(this->mqttState == Waiting) {
@@ -192,6 +190,8 @@ void MqttPubSub::OnUpdate(uint32_t deltaTime) {
             this->setSubscriptions();
             if(reconnectCallback != NULL)
                 reconnectCallback();
+        } else {
+            this->toWaiting();
         }
     }
 
@@ -202,4 +202,10 @@ void MqttPubSub::OnUpdate(uint32_t deltaTime) {
         }
     }
 
+}
+
+void MqttPubSub::toWaiting() {
+    syslog.logf(LOG_WARNING, "To Mqtt Waiting...");
+    timeWaitStarted = millis();
+    mqttState = Waiting;
 }
