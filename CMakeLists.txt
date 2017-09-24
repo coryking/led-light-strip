@@ -51,4 +51,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(${PROJECT_NAME} ${SRC_LIST} src/animations/FancyLight.h src/animations/FancyLight.cpp src/animations/FancyLight.h)
+add_executable(${PROJECT_NAME} ${SRC_LIST} src/animations/FancyLight.h src/animations/FancyLight.cpp src/animations/FancyLight.h src/animations/RandomPattern.cpp src/animations/RandomPattern.h)

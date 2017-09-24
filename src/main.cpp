@@ -19,6 +19,7 @@
 #include <Syslog.h>
 #include "config.h"
 
+#include "animations/RandomPattern.h"
 #include "animations/FancyLight.h"
 
 
@@ -53,7 +54,8 @@ TaskManager taskManager;
 
 ulong numLoops = 0;
 
-FancyLight* currentPattern;
+FancyLight* fancyLightPattern;
+RandomPattern* randomPattern;
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
 extern uint32_t _frame_cnt;
@@ -84,10 +86,10 @@ FunctionTask taskHandleOTA(onHandleOTA, MsToTaskTime(11));
 
 void showNewColor() {
     Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
-    if(currentPattern != NULL) {
-        currentPattern->setHue(ledColorValue.h);
-        currentPattern->setSaturation(ledColorValue.s);
-        currentPattern->changePalette();
+    if(fancyLightPattern != NULL) {
+        fancyLightPattern->setHue(ledColorValue.h);
+        fancyLightPattern->setSaturation(ledColorValue.s);
+        fancyLightPattern->changePalette();
     }
     writeToEEPROM();
 }
@@ -167,7 +169,7 @@ void setup() {
     }
     Serial.println("Done with setup!");
 
-    currentPattern = new FancyLight(NUM_LEDS);
+    fancyLightPattern = new FancyLight(NUM_LEDS);
 
     taskManager.StartTask(&taskManagePower);
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
@@ -252,7 +254,7 @@ void managePower(uint32_t deltaTime) {
             mqttPubSub.publishPower(false);
         }
     if(powerState == POWER_ON) {
-            currentPattern->readFrame(leds,millis());
+            fancyLightPattern->readFrame(leds,millis());
             FastLED.show();
             //FastLED.showColor(ledColorValue);
         }
