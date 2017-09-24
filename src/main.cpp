@@ -19,6 +19,7 @@
 #include <Syslog.h>
 #include "config.h"
 
+#include "animations/FancyLight.h"
 
 
 // How many leds in your strip?
@@ -44,7 +45,6 @@ PowerState powerState = POWERING_OFF;
 uint8_t  lastBrightness = 0;
 
 MqttPubSub mqttPubSub;
-CRGBPalette16 targetPalette = CRGBPalette16(ledColorValue);
 
 WiFiUDP udpClient;
 Syslog syslog(udpClient, SYSLOG_PROTO_BSD);
@@ -52,7 +52,8 @@ Syslog syslog(udpClient, SYSLOG_PROTO_BSD);
 TaskManager taskManager;
 
 ulong numLoops = 0;
-CRGBPalette16 currentPalette = CRGBPalette16(CRGB::Black);
+
+FancyLight* currentPattern;
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
 extern uint32_t _frame_cnt;
@@ -66,9 +67,6 @@ long lastWifiReconnectAttempt = 0;
 void readFromEEPROM();
 void writeToEEPROM();
 
-void newTargetPalette(uint32_t deltaTime);
-FunctionTask taskNewTargetPalette(newTargetPalette, MsToTaskTime(5000));
-
 void managePower(uint32_t deltaTime);
 FunctionTask taskManagePower(managePower, MsToTaskTime(1000 / FRAMES_PER_SECOND));
 
@@ -81,14 +79,16 @@ FunctionTask taskShowRetries(showRetries, MsToTaskTime(30000));
 void onMonitorWifi(uint32_t deltaTime);
 FunctionTask taskMonitorWifi(onMonitorWifi, MsToTaskTime(1000));
 
-void updateNoise(uint32_t deltaTime);
-
 void onHandleOTA(uint32_t deltaTime);
 FunctionTask taskHandleOTA(onHandleOTA, MsToTaskTime(11));
 
 void showNewColor() {
     Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
-    newTargetPalette(0);
+    if(currentPattern != NULL) {
+        currentPattern->setHue(ledColorValue.h);
+        currentPattern->setSaturation(ledColorValue.s);
+        currentPattern->changePalette();
+    }
     writeToEEPROM();
 }
 
@@ -167,8 +167,9 @@ void setup() {
     }
     Serial.println("Done with setup!");
 
+    currentPattern = new FancyLight(NUM_LEDS);
+
     taskManager.StartTask(&taskManagePower);
-    taskManager.StartTask(&taskNewTargetPalette);
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
     taskManager.StartTask(&taskShowRetries);
 #endif
@@ -217,19 +218,6 @@ void onMonitorWifi(uint32_t deltaTime) {
     }
 }
 
-void updateNoise(uint32_t deltaTime) {
-    static uint16_t  dist;
-    static uint16_t  scale=30;
-    static uint8_t maxChanges = 48;
-    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);  // Blend towards the target palette
-    for(int i = 0; i < NUM_LEDS; i++) {                                      // Just ONE loop to fill up the LED array as all of the pixels change.
-            uint8_t index = inoise8(i*scale, dist+i*scale) % 255;                  // Get a value from the noise function. I'm using both x and y axis.
-            leds[i] = ColorFromPalette(currentPalette, index, 255, LINEARBLEND);   // With that value, look up the 8 bit colour palette value and assign it to the current LED.
-        }
-    dist += beatsin8(10,1, 4);                                               // Moving along the distance (that random number we started out with). Vary it a bit with a sine wave.
-    // In some sketches, I've used millis() instead of an incremented counter. Works a treat.
-}
-
 void showRetries(uint32_t deltaTime) { syslog.logf(LOG_DEBUG, "R: %i, F: %i\n", _retry_cnt, _frame_cnt); }
 
 void showStats(uint32_t deltaTime) {
@@ -264,26 +252,8 @@ void managePower(uint32_t deltaTime) {
             mqttPubSub.publishPower(false);
         }
     if(powerState == POWER_ON) {
-            updateNoise(deltaTime);
+            currentPattern->readFrame(leds,millis());
             FastLED.show();
             //FastLED.showColor(ledColorValue);
         }
-}
-
-#define max(a,b) ((a)>(b)?(a):(b))
-#define min(a,b) ((a)<(b)?(a):(b))
-void newTargetPalette(uint32_t deltaTime) {
-    uint8_t ms = 0;
-
-    if(ledColorValue.s < 127) {
-        ms = min(255, ledColorValue.s + 16);
-    } else {
-        ms = max(0, ledColorValue.s - 64);
-    }
-
-    targetPalette = CRGBPalette16(
-                CHSV(random(ledColorValue.h-6, ledColorValue.h+6), ledColorValue.s, HSV_BRIGHTNESS),// random8(128,255)),
-                CHSV(random(ledColorValue.h-6, ledColorValue.h+6), ledColorValue.s, HSV_BRIGHTNESS), //random8(128,255)),
-                CHSV(ledColorValue.h, ms, HSV_BRIGHTNESS), //random8(128,255)),
-                CHSV(ledColorValue.h, ledColorValue.s, HSV_BRIGHTNESS)); //random8(128,255)));
 }
