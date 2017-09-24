@@ -64,7 +64,6 @@ LightPattern lightPattern = FancyLightPattern;
 
 FancyLight fancyLightPattern(NUM_LEDS);
 RandomPattern randomPattern(NUM_LEDS);
-AbstractPattern* currentPattern;
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
 extern uint32_t _frame_cnt;
@@ -92,8 +91,6 @@ FunctionTask taskMonitorWifi(onMonitorWifi, MsToTaskTime(1000));
 
 void onHandleOTA(uint32_t deltaTime);
 
-void setLightPattern();
-
 FunctionTask taskHandleOTA(onHandleOTA, MsToTaskTime(11));
 
 void showNewColor() {
@@ -101,20 +98,7 @@ void showNewColor() {
     fancyLightPattern.setHue(ledColorValue.h);
     fancyLightPattern.setSaturation(ledColorValue.s);
     fancyLightPattern.changePalette();
-    setLightPattern();
     writeToEEPROM();
-}
-
-void setLightPattern() {
-    switch(lightPattern) {
-        case FancyLightPattern:
-            currentPattern = &fancyLightPattern;
-            break;
-        case RandomLightPattern:
-            currentPattern = &randomPattern;
-            break;
-    }
-    Serial.println(currentPattern != NULL);
 }
 
 void setHueCb(uint8_t h) {
@@ -199,7 +183,6 @@ void setup() {
     }
     Serial.println("Done with setup!");
 
-    setLightPattern();
     taskManager.StartTask(&taskManagePower);
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
     taskManager.StartTask(&taskShowRetries);
@@ -285,8 +268,11 @@ void managePower(uint32_t deltaTime) {
             mqttPubSub.publishPower(false);
         }
     if(powerState == POWER_ON) {
-            currentPattern->readFrame(leds,millis());
-            FastLED.show();
-            //FastLED.showColor(ledColorValue);
-        }
+        if(lightPattern == LightPattern::RandomLightPattern)
+            randomPattern.readFrame(leds, millis());
+        else
+            fancyLightPattern.readFrame(leds,millis());
+
+        FastLED.show();
+    }
 }
