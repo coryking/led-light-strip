@@ -54,7 +54,7 @@ TaskManager taskManager;
 
 ulong numLoops = 0;
 
-FancyLight* fancyLightPatterng;
+FancyLight* fancyLightPattern;
 RandomPattern* randomPattern;
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
