@@ -174,6 +174,7 @@ void setup() {
         .setLightHueCallback(setHueCb)
         ->setLightBrightnessCallback(setBrightnessCb)
         ->setLightSaturationCallback(setSaturationCb)
+        ->setLightRandomCallback(setRandomCb)
         ->setLightPowerCallback(setPowerCb);
 
     mqttPubSub.setReconnectCallback(didConnectMQTT);
