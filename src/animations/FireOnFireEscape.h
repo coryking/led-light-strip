@@ -10,16 +10,9 @@
 #include "AbstractPattern.h"
 #include "FirePattern.h"
 
-typedef struct {
-    AbstractPattern* pattern;
-    uint16 offset;
-    uint16 length;
-
-} LightString;
 
 template <class T> class FireOnFireEscape : public AbstractPattern {
 private:
-    //std::vector<LightString> _lightStrings;
     ReversablePattern* bottomFire;
     ReversablePattern* leftFire;
     ReversablePattern* leftFrontFire;

@@ -47,6 +47,12 @@ uint16_t RandomPattern::readFrame(CRGB *buffer, ulong time) {
 RandomPattern::RandomPattern(uint16 numLeds) : AbstractPattern(numLeds) {
     targetLeds = (CRGB*)malloc(sizeof(CRGB) * numLeds);
 
+
+#ifdef USE_FIRE_PATTERNS
+    gPatterns.push_back(new MirrorPattern<FirePattern>(numLeds));
+    gPatterns.push_back(new MirrorPattern<PalettePattern>(numLeds));
+    gPatterns.push_back(new MirrorPattern<RainbowFirePattern>(numLeds));
+#else
     gPatterns.push_back(new Rainbow(numLeds));
     gPatterns.push_back(new RollingPattern(numLeds, RainbowColors_p));
     gPatterns.push_back(new RollingPattern(numLeds, RainbowStripeColors_p));
@@ -57,6 +63,7 @@ RandomPattern::RandomPattern(uint16 numLeds) : AbstractPattern(numLeds) {
     gPatterns.push_back(new RollingPattern(numLeds, OceanColors_p));
     gPatterns.push_back(new RollingPattern(numLeds, CloudColors_p));
     gPatterns.push_back(new RollingPattern(numLeds, ForestColors_p));
+#endif
 }
 
 RandomPattern::~RandomPattern() {

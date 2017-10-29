@@ -1,6 +1,8 @@
+#include "devices.h"
+
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 #define FASTLED_DEBUG_COUNT_FRAME_RETRIES
-#define FASTLED_RGBW
+
 //#define FASTLED_ALLOW_INTERRUPTS 0
 //#define FASTLED_INTERRUPT_RETRY_COUNT 1
 //#define DEBUG_ESP_OTA
@@ -23,15 +25,9 @@
 #include "MqttPubSub.h"
 
 
-
-
-// How many leds in your strip?
-#define NUM_LEDS 180
-
 // For led chips like Neopixels, which have a data line, ground, and power, you just
 // need to define DATA_PIN.  For led chipsets that are SPI based (four wires - data, clock,
 // ground, and power), like the LPD8806 define both DATA_PIN and CLOCK_PIN
-#define DATA_PIN 4
 
 #define DEFAULT_BRIGHTNESS 127
 
@@ -155,7 +151,7 @@ void setup() {
     Serial.printf("Hello from [%s]\n", hostString);
     ArduinoOTA.begin();
 
-    FastLED.addLeds<SK6812, DATA_PIN, GRB>(leds, NUM_LEDS);
+    FastLED.addLeds<LED_TYPE, DATA_PIN, GRB>(leds, NUM_LEDS);
     FastLED.setCorrection( TypicalLEDStrip );
 
     if(EEPROM.read(0) != 255) {

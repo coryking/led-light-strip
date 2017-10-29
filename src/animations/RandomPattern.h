@@ -7,6 +7,7 @@
 
 #include <FastLED.h>
 #include "patterns.h"
+#include "devices.h"
 
 #define TRANSITION_DURATION 4000
 
