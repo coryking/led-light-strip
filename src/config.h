@@ -11,6 +11,7 @@
 #define YOUR_WIFI_PASSWD "catsmeow"
 
 #define MQTT_SERVER "mqtt.gotokingfamily.com"
+#define MQTT_PORT 1883
 
 // Syslog server connection info
 #define SYSLOG_SERVER "192.168.1.85"

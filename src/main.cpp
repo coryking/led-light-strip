@@ -4,7 +4,7 @@
 #define FASTLED_DEBUG_COUNT_FRAME_RETRIES
 
 //#define FASTLED_ALLOW_INTERRUPTS 0
-//#define FASTLED_INTERRUPT_RETRY_COUNT 1
+#define FASTLED_INTERRUPT_RETRY_COUNT 1
 //#define DEBUG_ESP_OTA
 //#define DEBUG_ESP_PORT Serial
 #define OTA_DEBUG Serial
@@ -42,7 +42,7 @@ CHSV ledColorValue = CHSV(0,0,HSV_BRIGHTNESS);
 PowerState powerState = POWERING_OFF;
 uint8_t  lastBrightness = 0;
 
-MqttPubSub mqttPubSub;
+MqttPubSub mqttPubSub(MQTT_SERVER, MQTT_PORT);
 
 WiFiUDP udpClient;
 Syslog syslog(udpClient, SYSLOG_PROTO_BSD);

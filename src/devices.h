@@ -11,19 +11,22 @@
 
 //#define FASTLED_RGBW
 #define NUM_LEDS 102
-#define DATA_PIN 4
+#define DATA_PIN D2
 
-#define
-#elif defined(STRIP_BABYROOM)
-// for the baby room
+#endif
+#ifdef STRIP_BABYROOM
+/* for the baby room
+ main strip (180) + side wall (58)
+ */
 #    warning "Babyroom Strip"
 
+#define NUM_LEDS 238
 #define FASTLED_RGBW
-#define NUM_LEDS 180
-#define DATA_PIN 4
+#define DATA_PIN D2
 #define LED_TYPE SK6812
+#endif
 
-#elif defined(STRIP_OUTSIDE)
+#ifdef STRIP_OUTSIDE
 
 // Outside lights
 #    warning "Outside Strip"
@@ -32,10 +35,6 @@
 #define DATA_PIN D2
 #define LED_TYPE WS2812B
 #define USE_FIRE_PATTERNS
-
-#else
-
-#error "Nothing Defined!"
 
 #endif
 #endif //RGBWPLAY_DEVICES_H

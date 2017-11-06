@@ -24,7 +24,7 @@ uint16_t RandomPattern::readFrame(CRGB *buffer, ulong time) {
 
             if(time > startTransitionTime + TRANSITION_DURATION / 2) {
                 // we need to fade out the original...
-                const ulong fade_out_amount = map(time + TRANSITION_DURATION / 2, startTransitionTime, startTransitionTime + TRANSITION_DURATION /2 , 0, 255);
+                const ulong fade_out_amount = map(time, startTransitionTime + TRANSITION_DURATION /2, startTransitionTime + TRANSITION_DURATION , 0, 255);
                 fadeToBlackBy(buffer, getNumLeds(), fade_out_amount);
             } else {
                 // we need to fade in the new guy....
@@ -52,7 +52,7 @@ RandomPattern::RandomPattern(uint16 numLeds) : AbstractPattern(numLeds) {
     gPatterns.push_back(new MirrorPattern<FirePattern>(numLeds));
     gPatterns.push_back(new MirrorPattern<PalettePattern>(numLeds));
     gPatterns.push_back(new MirrorPattern<RainbowFirePattern>(numLeds));
-#else
+#endif
     gPatterns.push_back(new Rainbow(numLeds));
     gPatterns.push_back(new RollingPattern(numLeds, RainbowColors_p));
     gPatterns.push_back(new RollingPattern(numLeds, RainbowStripeColors_p));
@@ -63,7 +63,7 @@ RandomPattern::RandomPattern(uint16 numLeds) : AbstractPattern(numLeds) {
     gPatterns.push_back(new RollingPattern(numLeds, OceanColors_p));
     gPatterns.push_back(new RollingPattern(numLeds, CloudColors_p));
     gPatterns.push_back(new RollingPattern(numLeds, ForestColors_p));
-#endif
+
 }
 
 RandomPattern::~RandomPattern() {

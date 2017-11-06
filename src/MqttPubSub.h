@@ -15,6 +15,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include "config.h"
+#include <MqttController.h>
 
 #define MQTT_GET_RANDOM "/lightbulb/random/get"
 #define MQTT_GET_POWER "/lightbulb/power/get"
@@ -31,18 +32,9 @@
 // how long to wait for MQTT to settle before trying to connect
 #define MQTT_CONNECT_WAIT 6000
 
-enum MQTT_STATE {
-    Disconnecting,
-    Disconnected,
-    Waiting,
-    Connecting,
-    Connected
-};
-
-class MqttPubSub : public Task {
+class MqttPubSub : public MqttController {
 
 public:
-    typedef std::function<void(void)> ReconnectCallback;
     typedef std::function<void(int)> IntValueCallback;
     typedef std::function<void(bool)> PowerCallback;
 
@@ -50,10 +42,11 @@ public:
     typedef std::function<CHSV(void)> GetHSVCallback;
     typedef std::function<uint8_t(void)> GetBrightnessCallback;
 
-    MqttPubSub() : Task(MsToTaskTime(100)) {
-        getRandomClientId();
+    MqttPubSub(const char* mqttHost, const uint16_t mqttPort) : MqttController(mqttHost,mqttPort, &syslog) {
+        char espTheTopicId[20] = {0};
+        sprintf(espTheTopicId, "ESP_%06X", ESP.getChipId());
 
-        String espHostString = espTopicId;
+        String espHostString((const char *)espTheTopicId);
 
         mqttGetBrightnessTopic = espHostString + MQTT_GET_BRIGHTNESS;
         mqttGetHueTopic = espHostString + MQTT_GET_HUE;
@@ -89,20 +82,11 @@ public:
 
     MqttPubSub* setLightRandomCallback(const PowerCallback lightRandomCallback);
 
-    void setReconnectCallback(const ReconnectCallback reconnectCallback);
-
-    virtual void OnUpdate(uint32_t deltaTime);
+protected:
+    void mqttCallback(char *topic, byte *payload, unsigned int length) override;
+    void setSubscriptions() override;
 
 private:
-    PubSubClient *client;
-    WiFiClient wifiClient;
-    ulong timeWaitStarted = 0;
-    void setSubscriptions();
-    char espClientId[20] = {0};
-    char espTopicId[20] = {0};
-    void getRandomClientId();
-    void makePubSubClient();
-    MQTT_STATE mqttState = Disconnected;
 
     String mqttGetRandomTopic;
     String mqttGetPowerTopic;
@@ -123,16 +107,10 @@ private:
     PowerCallback lightRandomCallback;
 
 
-    ReconnectCallback reconnectCallback;
 
-    void mqttCallback(char* topic, byte* payload, unsigned int length);
     void setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, byte *payload, unsigned int length, int ol, int oh);
     void intRangeToChar(uint16_t in, uint16_t il, uint16_t ih, uint16_t ol, uint16_t oh, char* outBuff);
-    void publish(String &topic, const char* value);
-    void subscribe(String& topic);
 
-
-    void toWaiting();
 };
 
 #endif //RGBWPLAY_MQTTPUBSUB_H

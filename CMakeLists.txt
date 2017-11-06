@@ -16,6 +16,12 @@ add_custom_target(
 )
 
 add_custom_target(
+        PLATFORMIO_UPLOAD_BABYROOM ALL
+        COMMAND ${PLATFORMIO_CMD} -f -c clion run --target upload -e strip_babyroom
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_custom_target(
     PLATFORMIO_CLEAN ALL
     COMMAND ${PLATFORMIO_CMD} -f -c clion run --target clean
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -51,4 +57,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(${PROJECT_NAME} ${SRC_LIST} src/animations/MirrorPattern.h src/devices.h)
+add_executable(${PROJECT_NAME} ${SRC_LIST})
