@@ -7,6 +7,7 @@
 
 #include <Arduino.h>
 #include <FastLED.h>
+#include "Playable.h"
 
 #define DEFAULT_DURATION 3 * 60 * 1000
 
@@ -25,12 +26,10 @@
 
 #define CORNER_2 (MIDDLE_LENGTH + CORNER_1)
 
-class AbstractPattern {
+class AbstractPattern : public Playable {
 private:
     ulong _startTime;
 
-    uint16 _numLeds;
-    AbstractPattern();
 public:
 
     /**
@@ -41,9 +40,9 @@ public:
      */
     virtual uint16_t readFrame(CRGB * buffer, ulong time) = 0;
 
-    uint16 getNumLeds();
-
-    AbstractPattern(uint16 numLeds);
+    AbstractPattern(uint16 numLeds) : Playable(numLeds) {
+        _startTime = millis();
+    }
 
     virtual void resetRuntime();
 
