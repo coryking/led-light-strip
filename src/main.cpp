@@ -23,6 +23,8 @@
 #include "animations/FancyLight.h"
 #include "animations/RandomPattern.h"
 #include "MqttPubSub.h"
+#include "Mixer.h"
+#include "RandomPatternList.h"
 
 
 // For led chips like Neopixels, which have a data line, ground, and power, you just
