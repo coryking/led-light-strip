@@ -21,10 +21,10 @@
 #include "Wifi.h"
 #include "config.h"
 #include "animations/FancyLight.h"
-#include "animations/RandomPattern.h"
 #include "MqttPubSub.h"
 #include "Mixer.h"
 #include "RandomPatternList.h"
+#include "Player.h"
 
 
 // For led chips like Neopixels, which have a data line, ground, and power, you just
@@ -61,7 +61,8 @@ enum LightPattern {
 LightPattern lightPattern = FancyLightPattern;
 
 FancyLight fancyLightPattern(NUM_LEDS);
-RandomPattern randomPattern(NUM_LEDS);
+Player player(NUM_LEDS);
+//RandomPattern randomPattern(NUM_LEDS);
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
 extern uint32_t _frame_cnt;
@@ -267,9 +268,9 @@ void managePower(uint32_t deltaTime) {
             mqttPubSub.publishPower(false);
         }
     if(powerState == POWER_ON) {
-        if(lightPattern == LightPattern::RandomLightPattern)
-            randomPattern.readFrame(leds, millis());
-        else
+        //if(lightPattern == LightPattern::RandomLightPattern)
+            //randomPattern.readFrame(leds, millis());
+        //else
             fancyLightPattern.readFrame(leds,millis());
 
         FastLED.show();

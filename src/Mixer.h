@@ -18,9 +18,11 @@ enum MixerState {
 
 class Mixer : public Playable {
 public:
-    void setNextPattern(Playable *nextPattern, uint16_t transitionTime = DEFAULT_TRANSITION_TIME);
+    void setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime = DEFAULT_TRANSITION_TIME);
 
     uint16_t readFrame(CRGB *buffer, ulong time) override;
+
+    AbstractPattern *getCurrentPattern() const;
 
     Mixer(uint16_t numLeds);
 
@@ -29,8 +31,8 @@ public:
 private:
     CRGB *nextPatternLeds;
 
-    Playable *currentPattern = NULL;
-    Playable *nextPattern = NULL;
+    AbstractPattern *currentPattern = NULL;
+    AbstractPattern *nextPattern = NULL;
 
     ulong transitionStartTime;
     ulong transitionEndTime;

@@ -6,6 +6,8 @@
 #define RGBWPLAY_RANDOMPATTERNLIST_H
 
 #include <FastLED.h>
+#include <vector>
+#include "animations/AbstractPattern.h"
 
 typedef std::vector<AbstractPattern *> PatternList;
 
@@ -17,6 +19,15 @@ public:
 
     }
 
+    void addPattern(AbstractPattern* pattern) {
+        this->patterns.push_back(pattern);
+    }
+
+    void addPatterns(PatternList list) {
+        for(AbstractPattern* pattern : list) {
+            this->patterns.push_back(pattern);
+        }
+    }
     AbstractPattern * getRandomPattern() {
         if(this->patterns.size() == 0)
             return NULL;

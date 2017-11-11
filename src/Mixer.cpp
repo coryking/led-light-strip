@@ -38,7 +38,7 @@ Mixer::Mixer(uint16_t numLeds) : Playable(numLeds) {
     this->nextPatternLeds = (CRGB*)malloc(sizeof(CRGB) * numLeds);
 }
 
-void Mixer::setNextPattern(Playable *nextPattern, uint16_t transitionTime) {
+void Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime) {
     if(nextPattern == NULL || nextPattern == currentPattern)
         return;
 
@@ -56,4 +56,8 @@ void Mixer::transitionToSteadyState() {
     this->currentPattern = this->nextPattern;
     this->nextPattern = NULL;
     this->state = MIXER_STEADY_STATE;
+}
+
+AbstractPattern *Mixer::getCurrentPattern() const {
+    return currentPattern;
 }

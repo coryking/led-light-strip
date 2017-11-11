@@ -5,17 +5,17 @@
 #ifndef RGBWPLAY_SOLIDCOLOR_H
 #define RGBWPLAY_SOLIDCOLOR_H
 
-#include "Playable.h"
+#include "AbstractPattern.h"
 #include <FastLED.h>
 
-class SolidColor : public Playable  {
+class SolidColor : public AbstractPattern  {
 public:
     uint16_t readFrame(CRGB *buffer, ulong time) override {
         fill_solid(buffer, getNumLeds(), CRGB::Black);
         return getNumLeds();
     }
 
-    SolidColor(uint16_t numLeds) : Playable(numLeds) {
+    SolidColor(uint16_t numLeds) : AbstractPattern(numLeds) {
 
     }
 };
