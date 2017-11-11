@@ -62,7 +62,7 @@ private:
 
     SolidColor* offColor;
 
-    PlayerPowerState powerState;
+    PlayerPowerState powerState = PLAYER_POWERED_OFF;
 };
 
 #endif //RGBWPLAY_PLAYER_H

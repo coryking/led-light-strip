@@ -16,7 +16,7 @@ public:
     RandomPatternList() : RandomPatternList(PatternList()) {}
 
     RandomPatternList(PatternList patterns) : patterns(patterns) {
-
+        syslog.logf(LOG_INFO, "%d patterns", patterns.size());
     }
 
     void addPattern(AbstractPattern* pattern) {

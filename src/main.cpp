@@ -25,6 +25,7 @@
 #include "Mixer.h"
 #include "RandomPatternList.h"
 #include "Player.h"
+#include "BrightnessControl.h"
 
 
 // For led chips like Neopixels, which have a data line, ground, and power, you just
@@ -37,11 +38,9 @@
 
 
 // Define the array of leds
-CRGB leds[NUM_LEDS];
+//CRGB leds[NUM_LEDS];
 
 CHSV ledColorValue = CHSV(0,0,HSV_BRIGHTNESS);
-
-uint8_t  lastBrightness = 0;
 
 MqttPubSub mqttPubSub(MQTT_SERVER, MQTT_PORT);
 
@@ -54,7 +53,7 @@ ulong numLoops = 0;
 
 FancyLight fancyLightPattern(NUM_LEDS);
 Player player(NUM_LEDS);
-//RandomPattern randomPattern(NUM_LEDS);
+BrightnessControl brightness(MsToTaskTime(30));
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
 extern uint32_t _frame_cnt;
@@ -67,9 +66,6 @@ long lastWifiReconnectAttempt = 0;
 
 void readFromEEPROM();
 void writeToEEPROM();
-
-void managePower(uint32_t deltaTime);
-FunctionTask taskManagePower(managePower, MsToTaskTime(1000 / FRAMES_PER_SECOND));
 
 void showStats(uint32_t deltaTime);
 FunctionTask taskShowStats(showStats, MsToTaskTime(10000));
@@ -103,8 +99,7 @@ void setSaturationCb(uint8_t s) {
 }
 
 void setBrightnessCb(uint8_t v) {
-    FastLED.setBrightness(v);
-    lastBrightness = v;
+    brightness.setBrightness(v);
     showNewColor();
 }
 
@@ -124,7 +119,7 @@ void setRandomCb(bool randomState) {
 
 
 void didConnectMQTT() {
-    mqttPubSub.publishBrightness(FastLED.getBrightness());
+    mqttPubSub.publishBrightness(brightness.getBrightness());
     mqttPubSub.publishPower(player.getPower());
     mqttPubSub.publishHSV(ledColorValue);
     mqttPubSub.publishRandom(player.getMode() == PlayerMode::Mode_RandomPattern ? true : false);
@@ -145,12 +140,12 @@ void setup() {
     Serial.printf("Hello from [%s]\n", hostString);
     ArduinoOTA.begin();
 
-    FastLED.addLeds<LED_TYPE, DATA_PIN, GRB>(leds, NUM_LEDS);
+    FastLED.addLeds<LED_TYPE, DATA_PIN, GRB>(player.getFastLEDBuffer(), player.getNumLeds());
     FastLED.setCorrection( TypicalLEDStrip );
 
     if(EEPROM.read(0) != 255) {
         syslog.log(LOG_INFO, "Nothing in EEPROM");
-        lastBrightness = DEFAULT_BRIGHTNESS;
+        brightness.setBrightness(DEFAULT_BRIGHTNESS);
         ledColorValue = CHSV(0,0,HSV_BRIGHTNESS);
         writeToEEPROM();
     } else {
@@ -174,7 +169,6 @@ void setup() {
     }
     Serial.println("Done with setup!");
 
-    taskManager.StartTask(&taskManagePower);
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
     taskManager.StartTask(&taskShowRetries);
 #endif
@@ -183,13 +177,14 @@ void setup() {
     taskManager.StartTask(&mqttPubSub);
     taskManager.StartTask(&taskHandleOTA);
     taskManager.StartTask(&player);
+    taskManager.StartTask(&brightness);
 
 }
 
 void readFromEEPROM() {
-    lastBrightness = EEPROM.read(1);
+    brightness.setBrightness(EEPROM.read(1));
     ledColorValue = EEPROM.get(2, ledColorValue);
-    auto mode = (PlayerMode)EEPROM.get(3, PlayerMode::Mode_FixedPattern);
+    auto mode = (PlayerMode)EEPROM.read(3);
     if(mode != player.getMode()) {
         if(mode == PlayerMode::Mode_FixedPattern) {
             player.setFixedPatternMode(&fancyLightPattern);
@@ -201,9 +196,9 @@ void readFromEEPROM() {
 }
 
 void writeToEEPROM() {
-    syslog.logf(LOG_INFO, "to eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, lastBrightness);
+    syslog.logf(LOG_INFO, "to eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, brightness.getBrightness());
     EEPROM.write(0,255);
-    EEPROM.write(1, lastBrightness);
+    EEPROM.write(1, brightness.getBrightness());
     EEPROM.put(2, ledColorValue);
     EEPROM.put(3, player.getMode());
     EEPROM.commit();
@@ -247,31 +242,4 @@ void showStats(uint32_t deltaTime) {
     sprintf(lb, "L:%i NL:%i LPS:%u DUR:%u", lps, numLoops,lps/dur,dur);
     syslog.log(LOG_DEBUG, lb);
     Serial.println(lb);
-}
-
-void managePower(uint32_t deltaTime) {
-    if(powerState == POWERING_ON) {
-            uint8_t brightness = lastBrightness == 0 ? DEFAULT_BRIGHTNESS : lastBrightness;
-            FastLED.setBrightness(brightness);
-            lastBrightness = brightness;
-            powerState = POWER_ON;
-            mqttPubSub.publishPower(true);
-            mqttPubSub.publishHSV(ledColorValue);
-            mqttPubSub.publishBrightness(brightness);
-        }
-    if(powerState == POWERING_OFF) {
-            lastBrightness = (FastLED.getBrightness() == 0) ? lastBrightness : FastLED.getBrightness();
-            FastLED.setBrightness(0);
-            FastLED.showColor(CHSV(0, 0, 0));
-            powerState = POWERED_OFF;
-            mqttPubSub.publishPower(false);
-        }
-    if(powerState == POWER_ON) {
-        //if(lightPattern == LightPattern::RandomLightPattern)
-            //randomPattern.readFrame(leds, millis());
-        //else
-            fancyLightPattern.readFrame(leds,millis());
-
-        FastLED.show();
-    }
 }

@@ -18,6 +18,10 @@ public:
     SolidColor(uint16_t numLeds) : AbstractPattern(numLeds) {
 
     }
+
+    uint16_t getMinRuntime() override {
+        return 0;
+    }
 };
 
 

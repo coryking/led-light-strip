@@ -38,7 +38,7 @@ public:
      * @param time Timestamp, in milliseconds, when this was called
      * @return Number of bytes read
      */
-    virtual uint16_t readFrame(CRGB * buffer, ulong time) = 0;
+    //virtual uint16_t readFrame(CRGB * buffer, ulong time) = 0;
 
     AbstractPattern(uint16 numLeds) : Playable(numLeds) {
         _startTime = millis();

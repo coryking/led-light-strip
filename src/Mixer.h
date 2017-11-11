@@ -45,7 +45,7 @@ private:
 
     void transitionToSteadyState();
 
-    void readTransitionFrame(ulong time);
+    void readTransitionFrame(CRGB* buffer, ulong time);
 
     void readSteadyStateFrame(ulong time);
 };

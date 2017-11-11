@@ -7,7 +7,7 @@
 
 Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
         numLeds(numLeds),
-        Task(MsToTaskTime(framesPerSecond/1000))
+        Task(MsToTaskTime(1000/framesPerSecond))
 {
     offColor = new SolidColor(numLeds);
     buffer = (CRGB*)malloc(sizeof(CRGB) * numLeds);
@@ -37,17 +37,20 @@ void Player::OnUpdate(uint32_t deltaTime) {
 
     if(powerState == PLAYER_POWERING_ON) {
         this->mixer->setNextPattern(savedPattern, POWER_TRANSITION_MS);
+        syslog.log(LOG_INFO, "POWER_ON");
         powerState = PLAYER_POWER_ON;
     }
     if(powerState == PLAYER_POWERING_OFF) {
         savedPattern = this->mixer->getCurrentPattern();
         this->mixer->setNextPattern(offColor, POWER_TRANSITION_MS);
+        syslog.log(LOG_INFO, "POWER_OFF");
         powerState = PLAYER_POWERED_OFF;
     }
     if(powerState == PLAYER_POWER_ON || powerState == PLAYER_POWERED_OFF) {
         this->mixer->readFrame(this->getFastLEDBuffer(), time);
         if(this->getMode() == Mode_RandomPattern) {
             if (this->mixer->canStop()) {
+                syslog.log(LOG_INFO, "next pattern...");
                 this->mixer->setNextPattern(
                         this->list->getRandomPattern()
                 );
@@ -76,9 +79,11 @@ uint32_t Player::getNumLeds() const {
 
 void Player::setPower(bool power) {
     if(power && powerState == PLAYER_POWERED_OFF) {
+        syslog.log("Powering On");
         powerState = PLAYER_POWERING_ON;
     }
     if (!power && powerState == PLAYER_POWER_ON) {
+        syslog.log("Powering Off");
         powerState = PLAYER_POWERING_OFF;
     }
 
