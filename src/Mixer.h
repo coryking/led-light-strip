@@ -29,10 +29,11 @@ public:
     virtual ~Mixer();
 
 private:
-    CRGB *nextPatternLeds;
+    CRGB *oldPatternBuffer;
+    CRGB *currentPatternBuffer;
 
     AbstractPattern *currentPattern = NULL;
-    AbstractPattern *nextPattern = NULL;
+    AbstractPattern *oldPattern = NULL;
 
     ulong transitionStartTime;
     ulong transitionEndTime;
@@ -42,9 +43,9 @@ private:
 
     void transitionToSteadyState();
 
-    void readTransitionFrame(CRGB *buffer, ulong time);
+    void readTransitionFrame(ulong time);
 
-    void readSteadyStateFrame(CRGB *buffer, ulong time);
+    void readSteadyStateFrame(ulong time);
 };
 
 
