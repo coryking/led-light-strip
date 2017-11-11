@@ -22,12 +22,4 @@
 
 extern Syslog syslog;
 
-typedef enum {
-    POWERING_ON,
-    POWER_ON,
-    POWERING_OFF,
-    POWERED_OFF,
-
-} PowerState;
-
 #endif //RGBWPLAY_CONFIG_H

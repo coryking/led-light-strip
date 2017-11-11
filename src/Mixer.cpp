@@ -47,6 +47,7 @@ void Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime
 
     this->oldPattern = this->currentPattern;
     this->currentPattern = nextPattern;
+    this->currentPattern->resetRuntime();
 
     memcpy(this->oldPatternBuffer, this->currentPatternBuffer, sizeof(CRGB) * getNumLeds());
 
@@ -67,4 +68,8 @@ void Mixer::transitionToSteadyState() {
 
 AbstractPattern *Mixer::getCurrentPattern() const {
     return currentPattern;
+}
+
+bool Mixer::canStop() const {
+    return this->currentPattern->canStop();
 }

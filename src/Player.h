@@ -9,27 +9,41 @@
 #include <Task.h>
 #include "RandomPatternList.h"
 #include "Mixer.h"
+#include "Transitioner.h"
+#include "animations/SolidColor.h"
 
 #define FRAMES_PER_SECOND  60
+#define DEFAULT_BRIGHTNESS 255
+#define POWER_TRANSITION_MS 1000
 
-enum PlayerMode {
+typedef enum {
     Mode_FixedPattern = 0,
-    Mode_RandomPattern,
-};
+    Mode_RandomPattern
+} PlayerMode;
+
+typedef enum {
+    PLAYER_POWERING_ON,
+    PLAYER_POWER_ON,
+    PLAYER_POWERING_OFF,
+    PLAYER_POWERED_OFF,
+
+} PlayerPowerState;
 
 class Player : public Task {
 public:
     Player(uint32_t numLeds) : Player(numLeds, FRAMES_PER_SECOND) {}
     Player(uint32_t numLeds, uint8_t framesPerSecond);
 
-    void setCurrentPattern(AbstractPattern *pattern);
-
-    CRGB *getBuffer() const;
+    CRGB *getFastLEDBuffer() const;
 
     uint32_t getNumLeds() const;
 
     PlayerMode getMode() const;
-    void setMode(PlayerMode mode);
+    void setRandomMode();
+    void setFixedPatternMode(AbstractPattern* pattern);
+
+    void setPower(bool power);
+    bool getPower() const;
 
     virtual ~Player();
 
@@ -40,11 +54,15 @@ private:
     CRGB* buffer = NULL;
     uint32_t numLeds;
     PlayerMode mode = Mode_FixedPattern;
-
-    uint32_t timeForTransition;
+    PlayerMode savedMode;
+    AbstractPattern* savedPattern;
 
     Mixer* mixer;
     RandomPatternList* list;
+
+    SolidColor* offColor;
+
+    PlayerPowerState powerState;
 };
 
 #endif //RGBWPLAY_PLAYER_H

@@ -24,6 +24,8 @@ public:
 
     AbstractPattern *getCurrentPattern() const;
 
+    bool canStop() const;
+
     Mixer(uint16_t numLeds);
 
     virtual ~Mixer();

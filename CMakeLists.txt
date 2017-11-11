@@ -57,4 +57,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(${PROJECT_NAME} ${SRC_LIST} src/Playable.h src/Mixer.cpp src/Mixer.h src/animations/SolidColor.h src/RandomPatternList.h src/Player.h src/Player.cpp)
+add_executable(${PROJECT_NAME} ${SRC_LIST} src/Playable.h src/Mixer.cpp src/Mixer.h src/animations/SolidColor.h src/RandomPatternList.h src/Player.h src/Player.cpp src/Transitioner.h)

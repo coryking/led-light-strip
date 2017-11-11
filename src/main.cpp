@@ -41,7 +41,6 @@ CRGB leds[NUM_LEDS];
 
 CHSV ledColorValue = CHSV(0,0,HSV_BRIGHTNESS);
 
-PowerState powerState = POWERING_OFF;
 uint8_t  lastBrightness = 0;
 
 MqttPubSub mqttPubSub(MQTT_SERVER, MQTT_PORT);
@@ -52,13 +51,6 @@ Syslog syslog(udpClient, SYSLOG_PROTO_BSD);
 TaskManager taskManager;
 
 ulong numLoops = 0;
-
-enum LightPattern {
-    FancyLightPattern=0,
-    RandomLightPattern=1
-};
-
-LightPattern lightPattern = FancyLightPattern;
 
 FancyLight fancyLightPattern(NUM_LEDS);
 Player player(NUM_LEDS);
@@ -117,26 +109,25 @@ void setBrightnessCb(uint8_t v) {
 }
 
 void setPowerCb(bool power) {
-    if(power && powerState == POWERED_OFF) {
-        powerState = POWERING_ON;
-    }
-    if (!power && powerState == POWER_ON) {
-        powerState = POWERING_OFF;
-    }
-
+    player.setPower(power);
 }
 
 void setRandomCb(bool randomState) {
-    lightPattern = randomState ? LightPattern::RandomLightPattern : LightPattern::FancyLightPattern;
+    if(randomState) {
+        player.setRandomMode();
+    } else {
+        player.setFixedPatternMode(&fancyLightPattern);
+    }
+
     showNewColor();
 }
 
 
 void didConnectMQTT() {
     mqttPubSub.publishBrightness(FastLED.getBrightness());
-    mqttPubSub.publishPower(powerState == POWER_ON);
+    mqttPubSub.publishPower(player.getPower());
     mqttPubSub.publishHSV(ledColorValue);
-    mqttPubSub.publishRandom(lightPattern == LightPattern::RandomLightPattern ? true : false);
+    mqttPubSub.publishRandom(player.getMode() == PlayerMode::Mode_RandomPattern ? true : false);
 }
 
 void setup() {
@@ -191,13 +182,21 @@ void setup() {
     taskManager.StartTask(&taskMonitorWifi);
     taskManager.StartTask(&mqttPubSub);
     taskManager.StartTask(&taskHandleOTA);
+    taskManager.StartTask(&player);
 
 }
 
 void readFromEEPROM() {
     lastBrightness = EEPROM.read(1);
     ledColorValue = EEPROM.get(2, ledColorValue);
-    lightPattern = EEPROM.get(3, lightPattern);
+    auto mode = (PlayerMode)EEPROM.get(3, PlayerMode::Mode_FixedPattern);
+    if(mode != player.getMode()) {
+        if(mode == PlayerMode::Mode_FixedPattern) {
+            player.setFixedPatternMode(&fancyLightPattern);
+        } else {
+            player.setRandomMode();
+        }
+    }
     syslog.logf(LOG_INFO, "from eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
 }
 
@@ -206,7 +205,7 @@ void writeToEEPROM() {
     EEPROM.write(0,255);
     EEPROM.write(1, lastBrightness);
     EEPROM.put(2, ledColorValue);
-    EEPROM.put(3, lightPattern);
+    EEPROM.put(3, player.getMode());
     EEPROM.commit();
 }
 
