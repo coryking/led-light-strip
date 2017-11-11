@@ -39,6 +39,9 @@ Mixer::Mixer(uint16_t numLeds) : Playable(numLeds) {
 }
 
 void Mixer::setNextPattern(Playable *nextPattern, uint16_t transitionTime) {
+    if(nextPattern == NULL || nextPattern == currentPattern)
+        return;
+
     this->nextPattern = nextPattern;
     this->transitionStartTime = millis();
     this->transitionEndTime = this->transitionStartTime + transitionTime;
