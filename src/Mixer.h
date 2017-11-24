@@ -32,7 +32,6 @@ public:
 
 private:
     CRGB *oldPatternBuffer;
-    CRGB *currentPatternBuffer;
 
     AbstractPattern *currentPattern = NULL;
     AbstractPattern *oldPattern = NULL;
@@ -47,7 +46,7 @@ private:
 
     void readTransitionFrame(CRGB* buffer, ulong time);
 
-    void readSteadyStateFrame(ulong time);
+    void readSteadyStateFrame(CRGB* buffer, ulong time);
 };
 
 

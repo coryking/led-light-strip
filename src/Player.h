@@ -12,9 +12,9 @@
 #include "Transitioner.h"
 #include "animations/SolidColor.h"
 
-#define FRAMES_PER_SECOND  60
+#define FRAMES_PER_SECOND  200
 #define DEFAULT_BRIGHTNESS 255
-#define POWER_TRANSITION_MS 1000
+#define POWER_TRANSITION_MS 2000
 
 typedef enum {
     Mode_FixedPattern = 0,
@@ -40,7 +40,7 @@ public:
 
     PlayerMode getMode() const;
     void setRandomMode();
-    void setFixedPatternMode(AbstractPattern* pattern);
+    void setFixedPatternMode(AbstractPattern* pattern, uint16_t transitionTime = DEFAULT_TRANSITION_TIME);
 
     void setPower(bool power);
     bool getPower() const;

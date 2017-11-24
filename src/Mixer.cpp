@@ -11,16 +11,15 @@ uint16_t Mixer::readFrame(CRGB *buffer, ulong time) {
             this->readTransitionFrame(buffer, time);
             break;
         case MIXER_STEADY_STATE:
-            this->readSteadyStateFrame(time);
-            memcpy(buffer, this->currentPatternBuffer, sizeof(CRGB) * getNumLeds());
+            this->readSteadyStateFrame(buffer, time);
             break;
     }
 
     return getNumLeds();
 }
 
-void Mixer::readSteadyStateFrame(ulong time) {
-    this->currentPattern->readFrame(this->currentPatternBuffer, time);
+void Mixer::readSteadyStateFrame(CRGB* buffer, ulong time) {
+    this->currentPattern->readFrame(buffer, time);
 }
 
 void Mixer::readTransitionFrame(CRGB*buffer, ulong time) {
@@ -28,9 +27,9 @@ void Mixer::readTransitionFrame(CRGB*buffer, ulong time) {
     currentPattern->readFrame(buffer, time);
     oldPattern->readFrame(this->oldPatternBuffer, time);
 
-    blend(this->oldPatternBuffer, this->currentPatternBuffer, buffer, getNumLeds(), ease8InOutApprox(amountRemaining));
+    nblend(buffer, this->oldPatternBuffer, getNumLeds(), ease8InOutApprox(255-amountRemaining));
 
-    if(time > transitionEndTime) {
+    if(amountRemaining == 255 || time > transitionEndTime) {
         this->transitionToSteadyState();
     }
 }
@@ -38,7 +37,6 @@ void Mixer::readTransitionFrame(CRGB*buffer, ulong time) {
 Mixer::Mixer(uint16_t numLeds) : Playable(numLeds) {
     this->currentPattern = new SolidColor(numLeds);
     this->oldPatternBuffer = (CRGB*)malloc(sizeof(CRGB) * numLeds);
-    this->currentPatternBuffer = (CRGB*)malloc(sizeof(CRGB) * numLeds);
 }
 
 void Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime) {
@@ -51,7 +49,7 @@ void Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime
     this->currentPattern = nextPattern;
     this->currentPattern->resetRuntime();
 
-    memcpy(this->oldPatternBuffer, this->currentPatternBuffer, sizeof(CRGB) * getNumLeds());
+    //memcpy(this->oldPatternBuffer, this->currentPatternBuffer, sizeof(CRGB) * getNumLeds());
 
     this->transitionStartTime = millis();
     this->transitionEndTime = this->transitionStartTime + transitionTime;
@@ -62,7 +60,6 @@ void Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime
 
 Mixer::~Mixer() {
     free(this->oldPatternBuffer);
-    free(this->currentPatternBuffer);
 }
 
 void Mixer::transitionToSteadyState() {

@@ -8,7 +8,7 @@
 #include <Task.h>
 #include "Transitioner.h"
 
-#define BRIGHTNESS_TRANSITION 3000
+#define BRIGHTNESS_TRANSITION 1000
 
 class BrightnessControl : public Task {
 public:

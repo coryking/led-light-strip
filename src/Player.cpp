@@ -37,12 +37,18 @@ void Player::OnUpdate(uint32_t deltaTime) {
 
     if(powerState == PLAYER_POWERING_ON) {
         this->mixer->setNextPattern(savedPattern, POWER_TRANSITION_MS);
+        if(savedMode == Mode_RandomPattern) {
+            this->setRandomMode();
+        } else {
+            this->setFixedPatternMode(savedPattern, POWER_TRANSITION_MS);
+        }
         syslog.log(LOG_INFO, "POWER_ON");
         powerState = PLAYER_POWER_ON;
     }
     if(powerState == PLAYER_POWERING_OFF) {
         savedPattern = this->mixer->getCurrentPattern();
-        this->mixer->setNextPattern(offColor, POWER_TRANSITION_MS);
+        savedMode = this->getMode();
+        this->setFixedPatternMode(offColor, POWER_TRANSITION_MS);
         syslog.log(LOG_INFO, "POWER_OFF");
         powerState = PLAYER_POWERED_OFF;
     }
@@ -102,7 +108,7 @@ void Player::setRandomMode() {
     }
 }
 
-void Player::setFixedPatternMode(AbstractPattern* pattern) {
+void Player::setFixedPatternMode(AbstractPattern* pattern,  uint16_t transitionTime) {
     this->mode = Mode_FixedPattern;
-    this->mixer->setNextPattern(pattern);
+    this->mixer->setNextPattern(pattern, transitionTime);
 }
