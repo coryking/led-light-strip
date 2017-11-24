@@ -12,6 +12,7 @@
 //#define FASTLED_RGBW
 #define NUM_LEDS 102
 #define DATA_PIN D2
+#define DEVICE_NAME "Bathroom"
 
 #endif
 #ifdef STRIP_BABYROOM
@@ -24,6 +25,7 @@
 #define FASTLED_RGBW
 #define DATA_PIN D2
 #define LED_TYPE SK6812
+#define DEVICE_NAME "Babyroom"
 #endif
 
 #ifdef STRIP_OUTSIDE
@@ -35,6 +37,6 @@
 #define DATA_PIN D2
 #define LED_TYPE WS2812B
 #define USE_FIRE_PATTERNS
-
+#define DEVICE_NAME "Outside"
 #endif
 #endif //RGBWPLAY_DEVICES_H

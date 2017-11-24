@@ -29,6 +29,8 @@
 #define MQTT_SET_BRIGHTNESS "/lightbulb/brightness"
 #define MQTT_SET_SATURATION "/lightbulb/saturation"
 
+#define MQTT_DISCOVER "/homeassistant/light/"
+
 // how long to wait for MQTT to settle before trying to connect
 #define MQTT_CONNECT_WAIT 6000
 
@@ -61,6 +63,7 @@ public:
         mqttSetPowerTopic = espHostString + MQTT_SET_POWER;
         mqttSetRandomTopic = espHostString + MQTT_SET_RANDOM;
 
+        homeassistDiscoverTopic = MQTT_DISCOVER + espHostString + "/config";
 
     }
 
@@ -71,6 +74,8 @@ public:
     void publishPower(const bool isOn);
 
     void publishRandom(const bool isRandomMode);
+
+    void publishDiscover();
 
     MqttPubSub* setLightSaturationCallback(const IntValueCallback lightSaturationCallback);
 
@@ -99,6 +104,7 @@ private:
     String mqttSetHueTopic;
     String mqttSetBrightnessTopic;
     String mqttSetSaturationTopic;
+    String homeassistDiscoverTopic;
 
     IntValueCallback lightSaturationCallback;
     IntValueCallback lightBrightnessCallback;

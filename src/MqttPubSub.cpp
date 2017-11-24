@@ -3,7 +3,8 @@
 //
 
 #include "MqttPubSub.h"
-
+#include <ArduinoJson.h>
+#include "devices.h"
 
 void MqttPubSub::mqttCallback(char *topic, byte *payload, unsigned int length) {
 
@@ -63,6 +64,18 @@ void MqttPubSub::publishHSV(const CHSV &hsv) {
 
 void MqttPubSub::publishRandom(const bool isRandomMode) {
     publish(mqttGetRandomTopic, isRandomMode ? "true" : "false");
+}
+
+void MqttPubSub::publishDiscover() {
+    StaticJsonBuffer<1024> jsonBuffer;
+    JsonObject& root = jsonBuffer.createObject();
+    root["name"] = DEVICE_NAME;
+    root["command_topic"] = mqttSetPowerTopic;
+    root["brightness_command_topic"] = mqttSetBrightnessTopic;
+    root["brightness_scale"] = 100;
+    root["brightness_state_topic"] = mqttGetBrightnessTopic;
+    root["payload_on"] = "true";
+    root["payload_off"] = "false";
 }
 
 void MqttPubSub::setSubscriptions() {
