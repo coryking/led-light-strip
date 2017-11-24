@@ -39,6 +39,9 @@ protected:
 class CubicTransitioner : public Transitioner {
 public:
     uint8_t getCurrentValue(uint32_t currentTime) const override {
+        if(this->isComplete(currentTime))
+            return to;
+
         uint8_t linearValue =
                 (from > to) ?
                     map(currentTime, startTime, endTime, 255, 0) :
