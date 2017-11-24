@@ -21,7 +21,7 @@ Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
                new Rainbow(numLeds),
                new RollingPattern(numLeds, RainbowColors_p),
                new RollingPattern(numLeds, RainbowStripeColors_p),
-               new Sinelon(numLeds),
+               // new Sinelon(numLeds), // baby hates this one....
                new Confetti(numLeds),
                new Noise(numLeds),
                new JugglePattern(numLeds),
