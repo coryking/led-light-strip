@@ -112,3 +112,12 @@ void Player::setFixedPatternMode(AbstractPattern* pattern,  uint16_t transitionT
     this->mode = Mode_FixedPattern;
     this->mixer->setNextPattern(pattern, transitionTime);
 }
+
+void Player::setPattern(uint8_t patternNumber) {
+    if (this->getMode() == Mode_RandomPattern &&
+            patternNumber <= this->list->getNumPatterns()) {
+        this->mixer->setNextPattern(
+                this->list->getPattern(patternNumber)
+        );
+    }
+}

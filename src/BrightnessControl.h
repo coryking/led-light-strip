@@ -9,6 +9,7 @@
 #include "Transitioner.h"
 
 #define BRIGHTNESS_TRANSITION 1000
+#define BRIGHTNESS_INCREMENT 10
 
 class BrightnessControl : public Task {
 public:
@@ -26,6 +27,18 @@ public:
 
     uint8_t getBrightness() const {
         return this->brightness;
+    }
+
+    void incrementBrightness() {
+        uint16_t newBrightness = this->brightness + BRIGHTNESS_INCREMENT;
+        newBrightness = (newBrightness > 255) ? 255 : newBrightness;
+        this->setBrightness(newBrightness);
+    }
+
+    void decrementBrightness() {
+        int16_t newBrightness = this->brightness - BRIGHTNESS_INCREMENT;
+        newBrightness = (newBrightness < 0) ? 0 : newBrightness;
+        this->setBrightness(newBrightness);
     }
 
 protected:

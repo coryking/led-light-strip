@@ -5,6 +5,9 @@
 #ifndef RGBWPLAY_DEVICES_H
 #define RGBWPLAY_DEVICES_H
 
+#define HAS_IR_REMOTE
+#define IR_REMOTE_PIN D5
+
 #ifdef STRIP_BATHROOM
 // for the bathroom
 #    warning "Bathroom strip"

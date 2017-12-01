@@ -56,6 +56,10 @@ FancyLight fancyLightPattern(NUM_LEDS);
 Player player(NUM_LEDS);
 BrightnessControl brightness(MsToTaskTime(30));
 
+#ifdef HAS_IR_REMOTE
+RemoteControl remote;
+#endif
+
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
 extern uint32_t _frame_cnt;
 extern uint32_t _retry_cnt;
@@ -126,6 +130,45 @@ void didConnectMQTT() {
     mqttPubSub.publishRandom(player.getMode() == PlayerMode::Mode_RandomPattern ? true : false);
 }
 
+void remoteCallback(RemoteButtons buttons) {
+    syslog.logf(LOG_INFO, "Button [%i]\n", buttons);
+
+    switch(buttons) {
+        case BUTTON_OK:
+            player.setPower(!player.getPower());
+            break;
+        case BUTTON_LEFT:
+            player.setRandomMode();
+            break;
+        case BUTTON_RIGHT:
+            player.setFixedPatternMode(&fancyLightPattern);
+            break;
+        case BUTTON_UP:
+            brightness.incrementBrightness();
+            break;
+        case BUTTON_DOWN:
+            brightness.decrementBrightness();
+            break;
+        case BUTTON_0:
+        case BUTTON_1:
+        case BUTTON_2:
+        case BUTTON_3:
+        case BUTTON_4:
+        case BUTTON_5:
+        case BUTTON_6:
+        case BUTTON_7:
+        case BUTTON_8:
+        case BUTTON_9:
+            if(player.getMode() == Mode_FixedPattern) {
+                player.setPattern((uint8_t)buttons);
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
 void setup() {
     Serial.begin(9600);
     EEPROM.begin(sizeof(CHSV) + 2*sizeof(uint8_t));
@@ -179,6 +222,12 @@ void setup() {
     taskManager.StartTask(&taskHandleOTA);
     taskManager.StartTask(&player);
     taskManager.StartTask(&brightness);
+
+#ifdef HAS_IR_REMOTE
+    remote.initRemote(IR_REMOTE_PIN);
+    remote.setRemoteButtonPressedEvent(remoteCallback);
+    taskManager.StartTask(&remote);
+#endif
 
 }
 

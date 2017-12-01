@@ -35,6 +35,19 @@ public:
         uint8_t element = random8(this->patterns.size() - 1);
         return this->patterns[element];
     }
+
+    AbstractPattern * getPattern(uint8_t index) {
+        if(index >= this->patterns.size())
+            return this->patterns[0];
+
+        return this->patterns[index];
+    }
+
+    uint8_t getNumPatterns() {
+        return this->patterns.size();
+    }
+
+
 private:
     PatternList patterns;
 

@@ -40,6 +40,7 @@ public:
 
     PlayerMode getMode() const;
     void setRandomMode();
+    void setPattern(uint8_t patternNumber);
     void setFixedPatternMode(AbstractPattern* pattern, uint16_t transitionTime = DEFAULT_TRANSITION_TIME);
 
     void setPower(bool power);
