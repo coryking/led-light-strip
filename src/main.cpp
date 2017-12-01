@@ -26,6 +26,7 @@
 #include "RandomPatternList.h"
 #include "Player.h"
 #include "BrightnessControl.h"
+#include "RemoteControl.h"
 
 
 // For led chips like Neopixels, which have a data line, ground, and power, you just

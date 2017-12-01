@@ -16,12 +16,6 @@ add_custom_target(
 )
 
 add_custom_target(
-        PLATFORMIO_UPLOAD_BABYROOM ALL
-        COMMAND ${PLATFORMIO_CMD} -f -c clion run --target upload -e strip_babyroom
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-add_custom_target(
     PLATFORMIO_CLEAN ALL
     COMMAND ${PLATFORMIO_CMD} -f -c clion run --target clean
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -57,4 +51,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(${PROJECT_NAME} ${SRC_LIST} src/Playable.h src/Mixer.cpp src/Mixer.h src/animations/SolidColor.h src/RandomPatternList.h src/Player.h src/Player.cpp src/Transitioner.h src/BrightnessControl.h)
+add_executable(${PROJECT_NAME} ${SRC_LIST} src/RemoteControl.cpp src/RemoteControl.h src/Commands.h)

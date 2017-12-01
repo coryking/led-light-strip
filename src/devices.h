@@ -26,6 +26,20 @@
 #define LED_TYPE SK6812
 #endif
 
+#ifdef STRIP_BEDROOM
+/* for the baby room
+ main strip (180) + side wall (58)
+ */
+#    warning "Bedroom Strip"
+
+#define NUM_LEDS 238
+#define FASTLED_RGBW
+#define DATA_PIN D2
+#define LED_TYPE SK6812
+#define HAS_IR_REMOTE
+#define IR_REMOTE_PIN D5
+#endif
+
 #ifdef STRIP_OUTSIDE
 
 // Outside lights
