@@ -96,7 +96,7 @@ void Player::setPower(bool power) {
 }
 
 bool Player::getPower() const {
-    return false;
+    return (powerState == PLAYER_POWER_ON);
 }
 
 void Player::setRandomMode() {
@@ -114,8 +114,8 @@ void Player::setFixedPatternMode(AbstractPattern* pattern,  uint16_t transitionT
 }
 
 void Player::setPattern(uint8_t patternNumber) {
-    if (this->getMode() == Mode_RandomPattern &&
-            patternNumber <= this->list->getNumPatterns()) {
+    if (patternNumber <= this->list->getNumPatterns()) {
+        this->mode = Mode_FixedPattern;
         this->mixer->setNextPattern(
                 this->list->getPattern(patternNumber)
         );

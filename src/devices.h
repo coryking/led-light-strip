@@ -32,11 +32,11 @@
  */
 #    warning "Bedroom Strip"
 
-#define NUM_LEDS 4
+#define NUM_LEDS 180
 #define FASTLED_RGBW
 #define DATA_PIN D2
 #define LED_TYPE SK6812
-//#define HAS_IR_REMOTE
+#define HAS_IR_REMOTE
 #define IR_REMOTE_PIN D5
 #endif
 

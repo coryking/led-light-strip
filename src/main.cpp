@@ -159,9 +159,8 @@ void remoteCallback(RemoteButtons buttons) {
         case BUTTON_7:
         case BUTTON_8:
         case BUTTON_9:
-            if(player.getMode() == Mode_FixedPattern) {
-                player.setPattern((uint8_t)buttons);
-            }
+            player.setPattern((uint8_t)buttons);
+
             break;
 
         default:
