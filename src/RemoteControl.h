@@ -32,7 +32,23 @@ private:
     IRrecv *irrecv;
     std::map<uint64_t , RemoteButtons > remoteButtonMap =
             {
-                    { 0xFF38C7, BUTTON_0 },
+                    { 0xFF9867, BUTTON_0 },
+                    { 0xFFA25D, BUTTON_1 },
+                    { 0xFF629D, BUTTON_2 },
+                    { 0xFFE21D, BUTTON_3 },
+                    { 0xFF22DD, BUTTON_4 },
+                    { 0xFF02FD, BUTTON_5 },
+                    { 0xFFC23D, BUTTON_6 },
+                    { 0xFFE01F, BUTTON_7 },
+                    { 0xFFA857, BUTTON_8 },
+                    { 0xFF906F, BUTTON_9 },
+                    { 0xFF6897, BUTTON_ASTERISK },
+                    { 0xFFB04F, BUTTON_POUND },
+                    { 0xFF10EF, BUTTON_LEFT },
+                    { 0xFF5AA5, BUTTON_RIGHT },
+                    { 0xFF18E7, BUTTON_UP },
+                    { 0xFF4AB5, BUTTON_DOWN },
+                    { 0xFF38C7, BUTTON_OK },
             };
 
 };

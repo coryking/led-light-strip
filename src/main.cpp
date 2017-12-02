@@ -132,7 +132,7 @@ void didConnectMQTT() {
 
 void remoteCallback(RemoteButtons buttons) {
     syslog.logf(LOG_INFO, "Button [%i]\n", buttons);
-
+    Serial.printf("Button [%i]\n", buttons);
     switch(buttons) {
         case BUTTON_OK:
             player.setPower(!player.getPower());

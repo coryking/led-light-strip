@@ -5,9 +5,6 @@
 #ifndef RGBWPLAY_DEVICES_H
 #define RGBWPLAY_DEVICES_H
 
-#define HAS_IR_REMOTE
-#define IR_REMOTE_PIN D5
-
 #ifdef STRIP_BATHROOM
 // for the bathroom
 #    warning "Bathroom strip"
@@ -35,11 +32,11 @@
  */
 #    warning "Bedroom Strip"
 
-#define NUM_LEDS 238
+#define NUM_LEDS 4
 #define FASTLED_RGBW
 #define DATA_PIN D2
 #define LED_TYPE SK6812
-#define HAS_IR_REMOTE
+//#define HAS_IR_REMOTE
 #define IR_REMOTE_PIN D5
 #endif
 
