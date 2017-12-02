@@ -18,11 +18,12 @@ public:
     }
 
     void setBrightness(uint8_t brightness) {
+        uint64_t t = millis();
         syslog.logf(LOG_INFO, "b to %d (%d)", brightness, FastLED.getBrightness());
         this->oldBrightness = FastLED.getBrightness();
         this->brightness = brightness;
 
-        transitioner.resetTransitioner(millis(), BRIGHTNESS_TRANSITION, oldBrightness, brightness);
+        transitioner.resetTransitioner(t, BRIGHTNESS_TRANSITION, oldBrightness, brightness);
     }
 
     uint8_t getBrightness() const {
