@@ -4,6 +4,7 @@
 
 #include "Player.h"
 #include "animations/patterns.h"
+#include "devices.h"
 
 Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
         numLeds(numLeds),
@@ -34,7 +35,9 @@ Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
 void Player::OnUpdate(uint32_t deltaTime) {
     Task::OnUpdate(deltaTime);
     uint32_t time = millis();
-
+#ifdef DEBUG_LOOP_TIMING
+    uint32_t start_cyc = __clock_cycles();
+#endif
     if(powerState == PLAYER_POWERING_ON) {
         this->mixer->setNextPattern(savedPattern, POWER_TRANSITION_MS);
         if(savedMode == Mode_RandomPattern) {
@@ -63,8 +66,18 @@ void Player::OnUpdate(uint32_t deltaTime) {
             }
         }
     }
-
+#ifdef DEBUG_LOOP_TIMING
+    uint32_t reader_cyc = __clock_cycles();
+#endif
     FastLED.show();
+#ifdef DEBUG_LOOP_TIMING
+    uint32_t done_cyc = __clock_cycles();
+
+    EVERY_N_SECONDS_I(CYC_MEASURE,5) {
+        syslog.logf(LOG_INFO, "sr %i rd %i sd %i", reader_cyc-start_cyc, done_cyc - reader_cyc, done_cyc - start_cyc);
+    }
+#endif
+
 }
 
 PlayerMode Player::getMode() const {

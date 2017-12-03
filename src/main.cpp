@@ -35,7 +35,7 @@
 
 #define DEFAULT_BRIGHTNESS 127
 
-#define FRAMES_PER_SECOND  60
+#define FRAMES_PER_SECOND  120
 
 
 // Define the array of leds
