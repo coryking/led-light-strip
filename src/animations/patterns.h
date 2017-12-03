@@ -19,5 +19,6 @@
 #include "BpmPattern.h"
 #include "RollingPattern.h"
 #include "MirrorPattern.h"
+//#include "NoisePlusPalette.h"
 
 #endif //NEOPIXELLEDCONTROLLER_PATTERNS_H

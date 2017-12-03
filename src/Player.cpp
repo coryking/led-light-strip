@@ -28,7 +28,9 @@ Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
                new JugglePattern(numLeds),
                new RollingPattern(numLeds, OceanColors_p),
                new RollingPattern(numLeds, CloudColors_p),
-               new RollingPattern(numLeds, ForestColors_p),
+               new BpmPattern(numLeds),
+               //new NoisePlusPalette(numLeds),
+                                               //new RollingPattern(numLeds, ForestColors_p),
        });
 }
 

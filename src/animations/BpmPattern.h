@@ -14,7 +14,7 @@
 class BpmPattern : public HuePattern {
 protected:
     uint8_t  BeatsPerMinute = 62;
-    CRGBPalette16 palette = CloudColors_p;
+    CRGBPalette16 palette = (CRGBPalette16)CloudColors_p;
 public:
     void newVariant() override {
         BeatsPerMinute = random8(50, 80);
