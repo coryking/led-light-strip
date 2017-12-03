@@ -23,6 +23,7 @@ private:
     ReversablePattern* leftPattern;
     ReversablePattern* rightPattern;
     uint16_t middleLedPosition;
+
 public:
     virtual uint16_t readFrame(CRGB *buffer, ulong time) {
         /* for (auto & element : _lightStrings) {

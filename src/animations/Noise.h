@@ -16,6 +16,9 @@ private:
     CRGBPalette16 currentPalette; //(CRGB::Black);
     CRGBPalette16 targetPalette; //(OceanColors_p);
     uint16_t  minRuntime = DEFAULT_DURATION;
+protected:
+    void newTargetPalette();
+
 public:
     virtual uint16_t readFrame(CRGB *buffer, ulong time);
 
@@ -26,6 +29,9 @@ public:
     virtual uint16_t getMinRuntime() {
         return minRuntime;
     }
+
+    void newVariant() override;
+
 };
 
 

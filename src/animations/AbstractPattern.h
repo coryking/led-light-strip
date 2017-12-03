@@ -60,12 +60,21 @@ public:
     virtual uint16_t getMinRuntime() {
         return DEFAULT_DURATION;
     }
+
+    /***
+     * Switch to a new variation of this pattern.....
+     */
+    virtual void newVariant() {}
 };
 
 class HuePattern : public AbstractPattern {
 protected:
+    const uint16_t minHueDelay = 15;
+    const uint16_t maxHueDelay = 100;
     uint8_t gHue = 0; // rotating "base color" used by many of the patterns
     uint8_t gHueDelay = 20;
+    void newHueDelay() { gHueDelay = random(minHueDelay, maxHueDelay); }
+
 public:
     virtual uint16_t readFrame(CRGB *buffer, ulong time) {
         EVERY_N_MILLISECONDS(gHueDelay) {
@@ -74,13 +83,18 @@ public:
     }
 
     virtual void resetRuntime() {
-        gHueDelay = random(15, 50);
+        newHueDelay();
 
         AbstractPattern::resetRuntime();
     }
+
+    virtual void newVariant() override {
+
+    }
+
     HuePattern(uint16 numLeds) : AbstractPattern(numLeds) {
         gHue = random(0,255);
-        gHueDelay = random(15, 50);
+        newHueDelay();
     }
 };
 

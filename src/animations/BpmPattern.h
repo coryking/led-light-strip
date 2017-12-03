@@ -12,12 +12,18 @@
 #define INVERSE_WIDTH 10
 
 class BpmPattern : public HuePattern {
+protected:
+    uint8_t  BeatsPerMinute = 62;
+    CRGBPalette16 palette = CloudColors_p;
+public:
+    void newVariant() override {
+        BeatsPerMinute = random8(50, 80);
+    }
+
 public:
     virtual uint16_t readFrame(CRGB *buffer, ulong time) {
 
         HuePattern::readFrame(buffer,time);
-        uint8_t BeatsPerMinute = 62;
-        CRGBPalette16 palette = CloudColors_p;
         uint8_t beat = beatsin8( BeatsPerMinute, 191, 255);
 
         for( int i = 0; i < getNumLeds(); i++) { //9948

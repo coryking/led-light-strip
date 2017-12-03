@@ -17,12 +17,16 @@ uint16_t Noise::readFrame(CRGB *buffer, ulong time) {
     }
 
     EVERY_N_SECONDS_I(NOISE_READ_FRAME_PALETTE, 5) {             // Change the target palette to a random one every 5 seconds.
-        targetPalette = CRGBPalette16(
+        newTargetPalette();
+    }
+}
+
+void Noise::newTargetPalette() {
+    targetPalette = CRGBPalette16(
                 CHSV(random8(), 255, random8(128,255)),
                 CHSV(random8(), 255, random8(128,255)),
                 CHSV(random8(), 192, random8(128,255)),
                 CHSV(random8(), 255, random8(128,255)));
-    }
 }
 
 Noise::Noise(uint16 numLeds) : AbstractPattern(numLeds) {
@@ -34,4 +38,8 @@ Noise::Noise(uint16 numLeds) : AbstractPattern(numLeds) {
 void Noise::resetRuntime() {
     AbstractPattern::resetRuntime();
     minRuntime = DEFAULT_DURATION + random(0, DEFAULT_DURATION * 10);
+}
+
+void Noise::newVariant() {
+    AbstractPattern::newVariant();
 }

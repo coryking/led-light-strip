@@ -41,8 +41,11 @@ Mixer::Mixer(uint16_t numLeds) : Playable(numLeds) {
 
 void Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime) {
     syslog.log(LOG_INFO, "setting next pattern...");
-    if(nextPattern == NULL || nextPattern == currentPattern) {
+    if(nextPattern == NULL) {
         return;
+    }
+    if(nextPattern == currentPattern) {
+        currentPattern->newVariant();
     }
 
     this->oldPattern = this->currentPattern;
