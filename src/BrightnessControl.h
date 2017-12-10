@@ -17,13 +17,21 @@ public:
 
     }
 
-    void setBrightness(uint8_t brightness) {
+    void setBrightness(uint8_t brightness, boolean noDelay=false) {
         uint64_t t = millis();
         syslog.logf(LOG_INFO, "b to %d (%d)", brightness, FastLED.getBrightness());
         this->oldBrightness = FastLED.getBrightness();
         this->brightness = brightness;
 
-        transitioner.resetTransitioner(t, BRIGHTNESS_TRANSITION, oldBrightness, brightness);
+        uint32_t transitionSpeed = noDelay ? 0 : BRIGHTNESS_TRANSITION;
+
+        // If no delay, lets be literal and not even wait for
+        // the next time the task manager calls us....
+        if(noDelay) {
+            FastLED.setBrightness(brightness);
+        }
+
+        transitioner.resetTransitioner(t, noDelay, oldBrightness, brightness);
     }
 
     uint8_t getBrightness() const {
@@ -31,11 +39,11 @@ public:
     }
 
     void incrementBrightness() {
-        this->setBrightness(qadd8(this->brightness, BRIGHTNESS_INCREMENT));
+        this->setBrightness(qadd8(this->brightness, BRIGHTNESS_INCREMENT), true);
     }
 
     void decrementBrightness() {
-        this->setBrightness(qsub8(this->brightness, BRIGHTNESS_INCREMENT));
+        this->setBrightness(qsub8(this->brightness, BRIGHTNESS_INCREMENT), true);
     }
 
 protected:
