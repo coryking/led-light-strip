@@ -9,7 +9,6 @@
 #include "AbstractPattern.h"
 #define HSV_BRIGHTNESS 255
 
-
 class FancyLight : public AbstractPattern {
 private:
     uint16_t  dist;
@@ -40,6 +39,7 @@ public:
     }
 
     void changePalette();
+
 };
 
 

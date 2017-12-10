@@ -27,6 +27,8 @@
 #include "Player.h"
 #include "BrightnessControl.h"
 #include "RemoteControl.h"
+#include "FancyLightMixer.h"
+
 
 
 // For led chips like Neopixels, which have a data line, ground, and power, you just
@@ -52,7 +54,7 @@ TaskManager taskManager;
 
 ulong numLoops = 0;
 
-FancyLight fancyLightPattern(NUM_LEDS);
+FancyLightMixer *fancyLightPattern;
 Player player(NUM_LEDS);
 BrightnessControl brightness(MsToTaskTime(30));
 
@@ -87,9 +89,8 @@ FunctionTask taskHandleOTA(onHandleOTA, MsToTaskTime(11));
 
 void showNewColor() {
     Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
-    fancyLightPattern.setHue(ledColorValue.h);
-    fancyLightPattern.setSaturation(ledColorValue.s);
-    fancyLightPattern.changePalette();
+    fancyLightPattern->setHue(ledColorValue.h);
+    fancyLightPattern->setSaturation(ledColorValue.s);
     writeToEEPROM();
 }
 
@@ -116,7 +117,7 @@ void setRandomCb(bool randomState) {
     if(randomState) {
         player.setRandomMode();
     } else {
-        player.setFixedPatternMode(&fancyLightPattern);
+        player.setFixedPatternMode(fancyLightPattern);
     }
 
     showNewColor();
@@ -141,13 +142,21 @@ void remoteCallback(RemoteButtons buttons) {
             player.setRandomMode();
             break;
         case BUTTON_RIGHT:
-            player.setFixedPatternMode(&fancyLightPattern);
+            player.setFixedPatternMode(fancyLightPattern);
             break;
         case BUTTON_UP:
             brightness.incrementBrightness();
             break;
         case BUTTON_DOWN:
             brightness.decrementBrightness();
+            break;
+        case BUTTON_ASTERISK:
+            player.setFixedPatternMode(fancyLightPattern);
+            fancyLightPattern->changePreset(FancyLightPreset::PS_FULL_BRIGHT);
+            break;
+        case BUTTON_POUND:
+            player.setFixedPatternMode(fancyLightPattern);
+            fancyLightPattern->changePreset(FancyLightPreset::PS_NIGHT_MODE);
             break;
         case BUTTON_0:
         case BUTTON_1:
@@ -238,7 +247,7 @@ void readFromEEPROM() {
     auto mode = (PlayerMode)EEPROM.read(3);
     if(mode != player.getMode()) {
         if(mode == PlayerMode::Mode_FixedPattern) {
-            player.setFixedPatternMode(&fancyLightPattern);
+            player.setFixedPatternMode(fancyLightPattern);
         } else {
             player.setRandomMode();
         }
