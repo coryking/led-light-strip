@@ -9,10 +9,10 @@ uint16_t Confetti::readFrame(CRGB *buffer, ulong time) {
 
     // random colored speckles that blink in and fade smoothly
     fadeToBlackBy( buffer, getNumLeds(), 10);
-    if(nextConfettiPeiceTime <= time) {
+    if(nextConfettiPieceTime <= time) {
         int pos = random16(getNumLeds());
         buffer[pos] += CHSV(gHue + random8(64), 200, 255);
-        nextConfettiPeiceTime = time + confettiSpeeds[confettiSpeed];
+        nextConfettiPieceTime = time + confettiSpeeds[confettiSpeed];
     }
     return getNumLeds();
 }
@@ -25,5 +25,5 @@ void Confetti::newVariant() {
     confettiSpeed++;
     if(confettiSpeed==confettiSpeeds.size())
         confettiSpeed=0;
-    nextConfettiPeiceTime=0;
+    nextConfettiPieceTime=0;
 }
