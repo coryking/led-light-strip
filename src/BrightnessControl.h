@@ -28,7 +28,7 @@ public:
         // If no delay, lets be literal and not even wait for
         // the next time the task manager calls us....
         if(noDelay) {
-            FastLED.setBrightness(brightness);
+            setFastLEDBrightness(brightness);
         }
 
         transitioner.resetTransitioner(t, noDelay, oldBrightness, brightness);
@@ -52,9 +52,9 @@ protected:
         uint32_t time=millis();
         if(transitioner.isActive(time)) {
             auto bright = transitioner.getCurrentValue(time);
-            FastLED.setBrightness(bright);
+            setFastLEDBrightness(bright);
         } else {
-            FastLED.setBrightness(brightness);
+            setFastLEDBrightness(brightness);
         }
     }
 
@@ -62,6 +62,14 @@ private:
     uint8_t oldBrightness;
     uint8_t brightness;
     CubicTransitioner transitioner;
+
+    uint8_t getFastLEDBrightness() {
+        return brighten8_raw(FastLED.getBrightness());
+    }
+
+    void setFastLEDBrightness(uint8_t brightness) {
+        FastLED.setBrightness(dim8_raw(brightness));
+    }
 };
 
 #endif //RGBWPLAY_BRIGHTNESSCONTROL_H
