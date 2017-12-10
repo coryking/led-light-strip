@@ -159,6 +159,8 @@ void remoteCallback(RemoteButtons buttons) {
         case BUTTON_7:
         case BUTTON_8:
         case BUTTON_9:
+            // power up no matter what....
+            player.setPower(true);
             player.setPattern((uint8_t)buttons);
 
             break;
