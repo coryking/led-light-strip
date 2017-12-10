@@ -20,7 +20,7 @@ public:
 
 private:
     uint8_t confettiSpeed = 0;
-    std::vector<uint16_t> confettiSpeeds = {0, 200, 600};
+    std::vector<uint16_t> confettiSpeeds = {0, 10, 50};
     uint64_t nextConfettiPieceTime = 0;
 };
 

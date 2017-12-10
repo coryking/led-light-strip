@@ -45,7 +45,9 @@ void Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime
         return;
     }
     if(nextPattern == currentPattern) {
+        syslog.log(LOG_DEBUG, "moving to new variant...");
         currentPattern->newVariant();
+        return;
     }
 
     this->oldPattern = this->currentPattern;
