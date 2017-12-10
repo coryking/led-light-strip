@@ -9,6 +9,11 @@
 #include <vector>
 #include "AbstractPattern.h"
 
+typedef struct {
+    uint8_t pieceMinTime;
+    uint8_t pieceMaxTime;
+    uint8_t pieceDecayAmount;
+} ConfettiTime;
 
 class Confetti : public HuePattern {
 public:
@@ -20,7 +25,11 @@ public:
 
 private:
     uint8_t confettiSpeed = 0;
-    std::vector<uint16_t> confettiSpeeds = {0, 10, 50};
+    std::vector<ConfettiTime> confettiSpeeds = {
+            {0, 0, 10},
+            {3, 10, 5},
+            {15, 35, 3}
+    };
     uint64_t nextConfettiPieceTime = 0;
 };
 
