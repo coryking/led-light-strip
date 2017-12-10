@@ -53,6 +53,8 @@
 #define DATA_PIN D2
 #define LED_TYPE WS2812B
 #define USE_FIRE_PATTERNS
+#define FASTLED_ESP8266_DMA
+
 //#define DEBUG_LOOP_TIMING
 
 #endif
