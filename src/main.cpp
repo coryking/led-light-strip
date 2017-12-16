@@ -12,8 +12,6 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <FastLED.h>
-#include <ESP8266mDNS.h>
-#include <ArduinoOTA.h>
 #include <Task.h>
 #include <WiFiUdp.h>
 #include <Syslog.h>
@@ -21,7 +19,11 @@
 #include "Wifi.h"
 #include "config.h"
 #include "animations/FancyLight.h"
+#ifndef DO_NOT_USE_WIFI
 #include "MqttPubSub.h"
+#include <ESP8266mDNS.h>
+#include <ArduinoOTA.h>
+#endif
 #include "Mixer.h"
 #include "RandomPatternList.h"
 #include "Player.h"
@@ -43,9 +45,12 @@
 
 CHSV ledColorValue = CHSV(0,0,HSV_BRIGHTNESS);
 
+#ifndef DO_NOT_USE_WIFI
 MqttPubSub mqttPubSub(MQTT_SERVER, MQTT_PORT);
 
+#endif
 WiFiUDP udpClient;
+
 Syslog syslog(udpClient, SYSLOG_PROTO_BSD);
 
 TaskManager taskManager;
@@ -77,13 +82,6 @@ FunctionTask taskShowStats(showStats, MsToTaskTime(10000));
 
 void showRetries(uint32_t deltaTime);
 FunctionTask taskShowRetries(showRetries, MsToTaskTime(30000));
-
-void onMonitorWifi(uint32_t deltaTime);
-FunctionTask taskMonitorWifi(onMonitorWifi, MsToTaskTime(1000));
-
-void onHandleOTA(uint32_t deltaTime);
-
-FunctionTask taskHandleOTA(onHandleOTA, MsToTaskTime(11));
 
 void showNewColor() {
     Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
@@ -122,6 +120,14 @@ void setRandomCb(bool randomState) {
     showNewColor();
 }
 
+#ifndef DO_NOT_USE_WIFI
+
+void onMonitorWifi(uint32_t deltaTime);
+FunctionTask taskMonitorWifi(onMonitorWifi, MsToTaskTime(1000));
+
+void onHandleOTA(uint32_t deltaTime);
+
+FunctionTask taskHandleOTA(onHandleOTA, MsToTaskTime(11));
 
 void didConnectMQTT() {
     mqttPubSub.publishBrightness(brightness.getBrightness());
@@ -129,6 +135,7 @@ void didConnectMQTT() {
     mqttPubSub.publishHSV(ledColorValue);
     mqttPubSub.publishRandom(player.getMode() == PlayerMode::Mode_RandomPattern ? true : false);
 }
+#endif
 
 void remoteCallback(RemoteButtons buttons) {
     syslog.logf(LOG_INFO, "Button [%i]\n", buttons);
@@ -176,16 +183,26 @@ void setup() {
     sprintf(hostString, "ESP_%06X", ESP.getChipId());
     Serial.println();
     Serial.println(hostString);
+#ifndef DO_NOT_USE_WIFI
     setupWiFi();
     syslog.server(SYSLOG_SERVER, SYSLOG_PORT);
     syslog.deviceHostname(hostString);
+    ArduinoOTA.begin();
+#endif
+
     syslog.appName(APP_NAME);
     syslog.defaultPriority(LOG_DAEMON);
     syslog.logf(LOG_WARNING, "Hello from [%s]\n", hostString);
     Serial.printf("Hello from [%s]\n", hostString);
-    ArduinoOTA.begin();
 
+#ifdef MULTI_LED
+    FastLED.addLeds<LED_TYPE, DATA_0_PIN, GRB>(player.getFastLEDBuffer(), 0, LEDS_PER_STRIP);
+    FastLED.addLeds<LED_TYPE, DATA_1_PIN, GRB>(player.getFastLEDBuffer(), LEDS_PER_STRIP, LEDS_PER_STRIP);
+    FastLED.addLeds<LED_TYPE, DATA_2_PIN, GRB>(player.getFastLEDBuffer(), 2*LEDS_PER_STRIP, LEDS_PER_STRIP);
+    FastLED.addLeds<LED_TYPE, DATA_3_PIN, GRB>(player.getFastLEDBuffer(), 3*LEDS_PER_STRIP, LEDS_PER_STRIP);
+#else
     FastLED.addLeds<LED_TYPE, DATA_PIN, GRB>(player.getFastLEDBuffer(), player.getNumLeds());
+#endif
     FastLED.setCorrection( TypicalLEDStrip );
 
     if(EEPROM.read(0) != 255) {
@@ -200,6 +217,7 @@ void setup() {
     FastLED.setBrightness(0);
     FastLED.showColor(CRGB::Black);
 
+#ifndef DO_NOT_USE_WIFI
     mqttPubSub
         .setLightHueCallback(setHueCb)
         ->setLightBrightnessCallback(setBrightnessCb)
@@ -208,19 +226,20 @@ void setup() {
         ->setLightPowerCallback(setPowerCb);
 
     mqttPubSub.setReconnectCallback(didConnectMQTT);
+    taskManager.StartTask(&taskMonitorWifi);
+    taskManager.StartTask(&mqttPubSub);
     Serial.println("Gonna connect");
     if (!MDNS.begin(hostString)) {
         Serial.println("Error setting up MDNS responder!");
     }
     Serial.println("Done with setup!");
+    taskManager.StartTask(&taskHandleOTA);
+#endif
 
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
     taskManager.StartTask(&taskShowRetries);
 #endif
     taskManager.StartTask(&taskShowStats);
-    taskManager.StartTask(&taskMonitorWifi);
-    taskManager.StartTask(&mqttPubSub);
-    taskManager.StartTask(&taskHandleOTA);
     taskManager.StartTask(&player);
     taskManager.StartTask(&brightness);
 
@@ -261,6 +280,7 @@ void loop() {
     yield();
 }
 
+#ifndef DO_NOT_USE_WIFI
 void onHandleOTA(uint32_t deltaTime) {
     ArduinoOTA.handle();
 }
@@ -278,7 +298,7 @@ void onMonitorWifi(uint32_t deltaTime) {
         }
     }
 }
-
+#endif
 void showRetries(uint32_t deltaTime) { syslog.logf(LOG_DEBUG, "R: %i, F: %i\n", _retry_cnt, _frame_cnt); }
 
 void showStats(uint32_t deltaTime) {

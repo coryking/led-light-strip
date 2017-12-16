@@ -58,4 +58,24 @@
 //#define DEBUG_LOOP_TIMING
 
 #endif
+
+#ifdef STRIP_NK_BABYROOM
+
+#define NUM_LEDS    600
+#define LEDS_PER_STRIP 150
+#define MULTI_LED
+#define DATA_0_PIN D5
+#define DATA_1_PIN D6
+#define DATA_2_PIN D7
+#define DATA_3_PIN D8
+
+#define LED_TYPE SK6812
+#define DO_NOT_USE_WIFI
+#define FASTLED_RGBW
+#define HAS_IR_REMOTE
+#define IR_REMOTE_PIN D1
+
+
+
+#endif
 #endif //RGBWPLAY_DEVICES_H
