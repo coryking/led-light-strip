@@ -17,7 +17,7 @@ public:
 
     }
 
-    void setBrightness(uint8_t brightness, boolean noDelay=false) {
+    void  setBrightness(uint8_t brightness, boolean noDelay=false) {
         uint64_t t = millis();
         syslog.logf(LOG_INFO, "b to %d (%d)", brightness, FastLED.getBrightness());
         this->oldBrightness = FastLED.getBrightness();
@@ -34,15 +34,15 @@ public:
         transitioner.resetTransitioner(t, noDelay, oldBrightness, brightness);
     }
 
-    uint8_t getBrightness() const {
+    uint8_t ICACHE_FLASH_ATTR getBrightness() const {
         return this->brightness;
     }
 
-    void incrementBrightness() {
+    void ICACHE_FLASH_ATTR incrementBrightness() {
         this->setBrightness(qadd8(this->brightness, BRIGHTNESS_INCREMENT), true);
     }
 
-    void decrementBrightness() {
+    void ICACHE_FLASH_ATTR decrementBrightness() {
         this->setBrightness(qsub8(this->brightness, BRIGHTNESS_INCREMENT), true);
     }
 
@@ -63,11 +63,11 @@ private:
     uint8_t brightness;
     CubicTransitioner transitioner;
 
-    uint8_t getFastLEDBrightness() {
+    uint8_t ICACHE_FLASH_ATTR getFastLEDBrightness() {
         return brighten8_raw(FastLED.getBrightness());
     }
 
-    void setFastLEDBrightness(uint8_t brightness) {
+    void ICACHE_FLASH_ATTR setFastLEDBrightness(uint8_t brightness) {
         FastLED.setBrightness(dim8_raw(brightness));
     }
 };

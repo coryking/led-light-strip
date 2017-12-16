@@ -20,7 +20,7 @@ uint16_t FancyLight::readFrame(CRGB *buffer, ulong time) {
     }
 }
 
-void FancyLight::changePalette() {
+void ICACHE_FLASH_ATTR FancyLight::changePalette() {
     uint8_t ms = 0;
 
     if(saturation < 127) {
@@ -42,23 +42,22 @@ FancyLight::FancyLight(uint16 numLeds) : AbstractPattern(numLeds) {
     dist = random16(12345);
 }
 
-void FancyLight::resetRuntime() {
+void ICACHE_FLASH_ATTR FancyLight::resetRuntime() {
     AbstractPattern::resetRuntime();
     minRuntime = DEFAULT_DURATION + random(0, DEFAULT_DURATION * 10);
 }
 
-uint8_t FancyLight::getHue() const {
+uint8_t ICACHE_FLASH_ATTR FancyLight::getHue() const {
     return hue;
 }
 
-void FancyLight::setHue(uint8_t hue) {
+void ICACHE_FLASH_ATTR FancyLight::setHue(uint8_t hue) {
     FancyLight::hue = hue;
 }
 
-uint8_t FancyLight::getSaturation() const {
+uint8_t ICACHE_FLASH_ATTR FancyLight::getSaturation() const {
     return saturation;
 }
-
-void FancyLight::setSaturation(uint8_t saturation) {
+void ICACHE_FLASH_ATTR FancyLight::setSaturation(uint8_t saturation) {
     FancyLight::saturation = saturation;
 }

@@ -20,11 +20,11 @@ MotionLight::MotionLight(uint16 numLeds) : AbstractPattern(numLeds) {
 
 }
 
-Direction MotionLight::getDirection() {
+Direction ICACHE_FLASH_ATTR MotionLight::getDirection() {
     return _dir;
 }
 
-Direction MotionLight::setDirection(Direction dir) {
+Direction ICACHE_FLASH_ATTR MotionLight::setDirection(Direction dir) {
     if(dir==Forward) {
         location = 0;
     } else {
@@ -34,6 +34,6 @@ Direction MotionLight::setDirection(Direction dir) {
     return Forward;
 }
 
-uint16_t MotionLight::getPosition(int16_t offset) {
+uint16_t ICACHE_FLASH_ATTR MotionLight::getPosition(int16_t offset) {
     return (location + offset * getDirection()) % getNumLeds();
 }

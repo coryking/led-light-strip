@@ -29,7 +29,7 @@ public:
         }
     }
 
-    virtual void resetRuntime() {
+    virtual ICACHE_FLASH_ATTR void resetRuntime() {
         HuePattern::resetRuntime();
         BeatsPerMinute = random(50, 80);
     }

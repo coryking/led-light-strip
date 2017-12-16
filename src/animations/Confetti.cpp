@@ -24,7 +24,7 @@ uint16_t Confetti::readFrame(CRGB *buffer, ulong time) {
 Confetti::Confetti(uint16 numLeds) : HuePattern(numLeds) {
 }
 
-void Confetti::newVariant() {
+void ICACHE_FLASH_ATTR Confetti::newVariant() {
     HuePattern::newVariant();
     confettiSpeed++;
     if(confettiSpeed==confettiSpeeds.size())

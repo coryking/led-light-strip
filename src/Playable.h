@@ -20,7 +20,7 @@ public:
  */
     virtual uint16_t readFrame(CRGB * buffer, ulong time) = 0;
 
-    uint16 getNumLeds() const {
+    uint16 ICACHE_FLASH_ATTR getNumLeds() const {
         return _numLeds;
     }
 
