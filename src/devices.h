@@ -61,8 +61,13 @@
 
 #ifdef STRIP_NK_BABYROOM
 
-#define NUM_LEDS    600
+#    warning "Nathan Babyroom Strip"
+
+
 #define LEDS_PER_STRIP 150
+#define NUM_STRIPS 4
+#define NUM_LEDS    LEDS_PER_STRIP * NUM_STRIPS
+
 #define MULTI_LED
 #define DATA_0_PIN D5
 #define DATA_1_PIN D6
@@ -71,9 +76,9 @@
 
 #define LED_TYPE SK6812
 #define DO_NOT_USE_WIFI
-#define FASTLED_RGBW
+//#define FASTLED_RGBW
 #define HAS_IR_REMOTE
-#define IR_REMOTE_PIN D1
+#define IR_REMOTE_PIN D3
 
 
 
