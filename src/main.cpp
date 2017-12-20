@@ -198,10 +198,7 @@ void setup() {
     Serial.printf("Hello from [%s]\n", hostString);
 
 #ifdef MULTI_LED
-    FastLED.addLeds<LED_TYPE, DATA_0_PIN, GRB>(player.getFastLEDBuffer(), 0, LEDS_PER_STRIP);
-    FastLED.addLeds<LED_TYPE, DATA_1_PIN, GRB>(player.getFastLEDBuffer(), LEDS_PER_STRIP, LEDS_PER_STRIP);
-    FastLED.addLeds<LED_TYPE, DATA_2_PIN, GRB>(player.getFastLEDBuffer(), 2*LEDS_PER_STRIP, LEDS_PER_STRIP);
-    FastLED.addLeds<LED_TYPE, DATA_3_PIN, GRB>(player.getFastLEDBuffer(), 3*LEDS_PER_STRIP, LEDS_PER_STRIP);
+    FastLED.addLeds<SK6812_RGBW, NUM_STRIPS>(player.getFastLEDBuffer(), LEDS_PER_STRIP);
 #else
     FastLED.addLeds<LED_TYPE, DATA_PIN, GRB>(player.getFastLEDBuffer(), player.getNumLeds());
 #endif

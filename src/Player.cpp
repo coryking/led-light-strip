@@ -14,6 +14,8 @@ Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
     buffer = (CRGB*)malloc(sizeof(CRGB) * numLeds);
     this->mixer = new Mixer(numLeds);
     this->list = new RandomPatternList({
+           // new NoisyConfetti(numLeds),
+
 #ifdef USE_FIRE_PATTERNS
                 new MirrorPattern<FirePattern>(numLeds),
                 new MirrorPattern<PalettePattern>(numLeds),
@@ -31,6 +33,7 @@ Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
                new BpmPattern(numLeds),
                //new NoisePlusPalette(numLeds),
                                                //new RollingPattern(numLeds, ForestColors_p),
+
        });
 }
 
