@@ -214,8 +214,8 @@ void setup() {
         syslog.log(LOG_INFO, "Reading from EEPROM");
         readFromEEPROM();
     }
-    FastLED.setBrightness(64);
-    FastLED.showColor(CRGB::Red);
+    FastLED.setBrightness(0);
+    FastLED.showColor(CRGB::Black);
 
 #ifndef DO_NOT_USE_WIFI
     mqttPubSub
