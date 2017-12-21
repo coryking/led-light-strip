@@ -3,12 +3,17 @@
 //
 
 #include "NoisyConfetti.h"
+#include "patterns.h"
 
 uint16_t NoisyConfetti::readFrame(CRGB *buffer, ulong time) {
     HuePattern::readFrame(buffer,time);
 
+    fadeToBlackBy( buffer, getNumLeds(), confettiSpeeds[confettiSpeed].pieceDecayAmount);
+
+
     for(int i=0; i < getNumLeds(); i++) {
-        buffer[i] = CHSV(255, 0, random8(0, MAX_NOISE_BRIGHTNESS));
+        if(random(0, 1000) < confettiSpeeds[confettiSpeed].numPixels && buffer[i] < CRGB(127,127,127))
+            buffer[i] = CHSV(random8(), random8(0, 25), random8(0, MAX_NOISE_BRIGHTNESS));
     }
 
     if(nextConfettiPieceTime <= time) {

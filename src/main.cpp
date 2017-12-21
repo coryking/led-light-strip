@@ -229,9 +229,9 @@ void setup() {
     taskManager.StartTask(&taskMonitorWifi);
     taskManager.StartTask(&mqttPubSub);
     Serial.println("Gonna connect");
-    if (!MDNS.begin(hostString)) {
-        Serial.println("Error setting up MDNS responder!");
-    }
+    //if (!MDNS.begin(hostString)) {
+    //    Serial.println("Error setting up MDNS responder!");
+    //}
     Serial.println("Done with setup!");
     taskManager.StartTask(&taskHandleOTA);
 #endif

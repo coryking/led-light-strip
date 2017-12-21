@@ -14,7 +14,7 @@ Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
     buffer = (CRGB*)malloc(sizeof(CRGB) * numLeds);
     this->mixer = new Mixer(numLeds);
     this->list = new RandomPatternList({
-           // new NoisyConfetti(numLeds),
+           new NoisyConfetti(numLeds),
 
 #ifdef USE_FIRE_PATTERNS
                 new MirrorPattern<FirePattern>(numLeds),
@@ -51,7 +51,6 @@ void Player::OnUpdate(uint32_t deltaTime) {
             this->setFixedPatternMode(savedPattern, POWER_TRANSITION_MS);
         }
         syslog.log(LOG_INFO, "POWER_ON");
-        Serial.println("POWER_ON");
         powerState = PLAYER_POWER_ON;
     }
     if(powerState == PLAYER_POWERING_OFF) {
@@ -59,7 +58,6 @@ void Player::OnUpdate(uint32_t deltaTime) {
         savedMode = this->getMode();
         this->setFixedPatternMode(offColor, POWER_TRANSITION_MS);
         syslog.log(LOG_INFO, "POWER_OFF");
-        Serial.println("POWER_OFF");
         powerState = PLAYER_POWERED_OFF;
     }
     if(powerState == PLAYER_POWER_ON || powerState == PLAYER_POWERED_OFF) {
@@ -67,7 +65,6 @@ void Player::OnUpdate(uint32_t deltaTime) {
         if(this->getMode() == Mode_RandomPattern) {
             if (this->mixer->canStop()) {
                 syslog.log(LOG_INFO, "next pattern...");
-                Serial.println("next pattern");
                 this->mixer->setNextPattern(
                         this->list->getRandomPattern()
                 );
@@ -107,12 +104,10 @@ uint32_t Player::getNumLeds() const {
 void Player::setPower(bool power) {
     if(power && powerState == PLAYER_POWERED_OFF) {
         syslog.log("Powering On");
-        Serial.println("Powering On");
         powerState = PLAYER_POWERING_ON;
     }
     if (!power && powerState == PLAYER_POWER_ON) {
         syslog.log("Powering Off");
-        Serial.println("Powering Off");
         powerState = PLAYER_POWERING_OFF;
     }
 

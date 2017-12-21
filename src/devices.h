@@ -21,11 +21,11 @@
 #    warning "Babyroom Strip"
 
 #define NUM_LEDS 238
-#define FASTLED_RGBW
+//#define FASTLED_RGBW
 #define FASTLED_ESP8266_DMA
 
 #define DATA_PIN D2
-#define LED_TYPE SK6812
+#define LED_TYPE SK6812_RGBW
 //#define DEBUG_LOOP_TIMING
 #endif
 
@@ -35,10 +35,10 @@
 #    warning "Bedroom Strip"
 
 #define NUM_LEDS 180
-#define FASTLED_RGBW
+//#define FASTLED_RGBW
 #define FASTLED_ESP8266_DMA
 #define DATA_PIN D2
-#define LED_TYPE SK6812
+#define LED_TYPE SK6812_RGBW
 #define HAS_IR_REMOTE
 #define IR_REMOTE_PIN D5
 #define DEBUG_LOOP_TIMING
