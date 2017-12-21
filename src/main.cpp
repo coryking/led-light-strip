@@ -198,7 +198,8 @@ void setup() {
     Serial.printf("Hello from [%s]\n", hostString);
 
 #ifdef MULTI_LED
-    FastLED.addLeds<SK6812_RGBW, NUM_STRIPS>(player.getFastLEDBuffer(), LEDS_PER_STRIP);
+    FastLED.addLeds<SK6812_PORTA, NUM_STRIPS>(player.getFastLEDBuffer(), LEDS_PER_STRIP);
+    FastLED.setDither(0);
 #else
     FastLED.addLeds<LED_TYPE, DATA_PIN, GRB>(player.getFastLEDBuffer(), player.getNumLeds());
 #endif
@@ -213,8 +214,8 @@ void setup() {
         syslog.log(LOG_INFO, "Reading from EEPROM");
         readFromEEPROM();
     }
-    FastLED.setBrightness(0);
-    FastLED.showColor(CRGB::Black);
+    FastLED.setBrightness(64);
+    FastLED.showColor(CRGB::Red);
 
 #ifndef DO_NOT_USE_WIFI
     mqttPubSub

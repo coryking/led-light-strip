@@ -20,6 +20,7 @@ public:
     void  setBrightness(uint8_t brightness, boolean noDelay=false) {
         uint64_t t = millis();
         syslog.logf(LOG_INFO, "b to %d (%d)", brightness, FastLED.getBrightness());
+        Serial.printf("b to %d (%d)\n", brightness, FastLED.getBrightness());
         this->oldBrightness = FastLED.getBrightness();
         this->brightness = brightness;
 
