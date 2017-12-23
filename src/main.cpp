@@ -199,10 +199,12 @@ void setup() {
 
 #ifdef MULTI_LED
     FastLED.addLeds<SK6812_PORTA, NUM_STRIPS>(player.getFastLEDBuffer(), LEDS_PER_STRIP);
-    FastLED.setDither(0);
 #else
     FastLED.addLeds<LED_TYPE, DATA_PIN, GRB>(player.getFastLEDBuffer(), player.getNumLeds());
 #endif
+    // TODO: FIX THIS!!!
+    //FastLED.setDither(0);
+
     FastLED.setCorrection( TypicalLEDStrip );
 
     if(EEPROM.read(0) != 255) {
