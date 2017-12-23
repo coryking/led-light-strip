@@ -76,7 +76,7 @@
 
 #define LED_TYPE SK6812
 #define DO_NOT_USE_WIFI
-//#define FASTLED_RGBW
+#define FASTLED_RGBW
 #define HAS_IR_REMOTE
 #define IR_REMOTE_PIN D3
 
