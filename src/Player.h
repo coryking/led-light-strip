@@ -12,7 +12,7 @@
 #include "Transitioner.h"
 #include "animations/SolidColor.h"
 
-#define FRAMES_PER_SECOND  200
+#define FRAMES_PER_SECOND  250
 #define DEFAULT_BRIGHTNESS 255
 #define POWER_TRANSITION_MS 2000
 

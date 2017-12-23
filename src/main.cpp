@@ -39,9 +39,6 @@
 
 #define DEFAULT_BRIGHTNESS 127
 
-#define FRAMES_PER_SECOND  120
-
-
 // Define the array of leds
 //CRGB leds[NUM_LEDS];
 
@@ -308,6 +305,8 @@ void ICACHE_FLASH_ATTR showStats(uint32_t deltaTime) {
     static ulong lastLoopCnt = 0;
     static char lb[100] = {0};
     syslog.logf(LOG_DEBUG, "F: %i\n", FastLED.getFPS());
+    Serial.printf("F: %i\n", FastLED.getFPS());
+
 
     ulong dur = deltaTime / 1000;
     ulong lps = numLoops - lastLoopCnt;
