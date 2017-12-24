@@ -5,15 +5,11 @@
 #ifndef RGBWPLAY_FANCYLIGHTMIXER_H
 #define RGBWPLAY_FANCYLIGHTMIXER_H
 
+#include <FastLED.h>
 #include "animations/FancyLight.h"
 #include "animations/AbstractPattern.h"
 #include "BrightnessControl.h"
 #include <map>
-typedef struct {
-    uint8_t hue;
-    uint8_t saturation;
-    uint8_t brightness;
-} FancyLightPresetItem;
 
 enum FancyLightPreset
 {
@@ -39,7 +35,7 @@ private:
     BrightnessControl* brightnessControl;
     FancyLight* fancyLight;
 
-    const std::map<FancyLightPreset, FancyLightPresetItem> lightPresets = {
+    const std::map<FancyLightPreset, CHSV> lightPresets = {
             {PS_NIGHT_MODE, {17, 255, 38}},
             {PS_RED_MODE, {0, 255, 38}},
             {PS_FULL_BRIGHT, {255,255,255}},
