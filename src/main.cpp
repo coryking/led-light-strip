@@ -58,7 +58,7 @@ TaskManager taskManager;
 
 ulong numLoops = 0;
 
-FancyLightMixer *fancyLightPattern;
+FancyLightMixer *fancyLightMixer;
 Player player(NUM_LEDS);
 BrightnessControl brightness(MsToTaskTime(30));
 
@@ -86,8 +86,8 @@ FunctionTask taskShowRetries(showRetries, MsToTaskTime(30000));
 
 void ICACHE_FLASH_ATTR showNewColor() {
     Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
-    fancyLightPattern->setHue(ledColorValue.h);
-    fancyLightPattern->setSaturation(ledColorValue.s);
+    fancyLightMixer->setHue(ledColorValue.h);
+    fancyLightMixer->setSaturation(ledColorValue.s);
     writeToEEPROM();
 }
 
@@ -114,7 +114,7 @@ void ICACHE_FLASH_ATTR setRandomCb(bool randomState) {
     if(randomState) {
         player.setRandomMode();
     } else {
-        player.setFixedPatternMode(fancyLightPattern);
+        player.setFixedPatternMode(fancyLightMixer);
     }
 
     showNewColor();
@@ -140,6 +140,7 @@ void didConnectMQTT() {
 void ICACHE_FLASH_ATTR remoteCallback(RemoteButtons buttons) {
     syslog.logf(LOG_INFO, "Button [%i]\n", buttons);
     Serial.printf("Button [%i]\n", buttons);
+
     switch(buttons) {
         case BUTTON_OK:
             player.setPower(!player.getPower());
@@ -148,7 +149,7 @@ void ICACHE_FLASH_ATTR remoteCallback(RemoteButtons buttons) {
             player.setRandomMode();
             break;
         case BUTTON_RIGHT:
-            player.setFixedPatternMode(fancyLightPattern);
+            player.setFancyLightMode();
             break;
         case BUTTON_UP:
             brightness.incrementBrightness();
@@ -157,12 +158,10 @@ void ICACHE_FLASH_ATTR remoteCallback(RemoteButtons buttons) {
             brightness.decrementBrightness();
             break;
         case BUTTON_ASTERISK:
-            player.setFixedPatternMode(fancyLightPattern);
-            fancyLightPattern->changePreset(FancyLightPreset::PS_FULL_BRIGHT);
+            player.setFancyLightMode(FancyLightPreset::PS_FULL_BRIGHT);
             break;
         case BUTTON_POUND:
-            player.setFixedPatternMode(fancyLightPattern);
-            fancyLightPattern->changePreset(FancyLightPreset::PS_NIGHT_MODE);
+            player.setFancyLightMode(FancyLightPreset::PS_NIGHT_MODE);
             break;
         case BUTTON_0:
         case BUTTON_1:
@@ -208,10 +207,10 @@ void setup() {
 #else
     FastLED.addLeds<LED_TYPE, DATA_PIN, GRB>(player.getFastLEDBuffer(), player.getNumLeds());
 #endif
-    // TODO: FIX THIS!!!
-    //FastLED.setDither(0);
-
     FastLED.setCorrection( TypicalLEDStrip );
+
+    fancyLightMixer = new FancyLightMixer(NUM_LEDS, &brightness);
+    player.setFancyLight(fancyLightMixer);
 
     if(EEPROM.read(0) != 255) {
         syslog.log(LOG_INFO, "Nothing in EEPROM");
@@ -265,7 +264,7 @@ void ICACHE_FLASH_ATTR readFromEEPROM() {
     auto mode = (PlayerMode)EEPROM.read(3);
     if(mode != player.getMode()) {
         if(mode == PlayerMode::Mode_FixedPattern) {
-            player.setFixedPatternMode(fancyLightPattern);
+            player.setFixedPatternMode(fancyLightMixer);
         } else {
             player.setRandomMode();
         }

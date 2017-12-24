@@ -11,6 +11,7 @@
 #include "Mixer.h"
 #include "Transitioner.h"
 #include "animations/SolidColor.h"
+#include "FancyLightMixer.h"
 
 #define FRAMES_PER_SECOND  200
 #define DEFAULT_BRIGHTNESS 255
@@ -18,7 +19,8 @@
 
 typedef enum {
     Mode_FixedPattern = 0,
-    Mode_RandomPattern
+    Mode_RandomPattern,
+    Mode_FancyLightPattern
 } PlayerMode;
 
 typedef enum {
@@ -31,8 +33,9 @@ typedef enum {
 
 class Player : public Task {
 public:
-    Player(uint32_t numLeds) : Player(numLeds, FRAMES_PER_SECOND) {}
-    Player(uint32_t numLeds, uint8_t framesPerSecond);
+    Player(uint32_t numLeds) : Player(numLeds, FRAMES_PER_SECOND, NULL) {}
+    Player(uint32_t numLeds, FancyLightMixer* fancyLightMixer) : Player(numLeds, FRAMES_PER_SECOND, fancyLightMixer) {}
+    Player(uint32_t numLeds, uint8_t framesPerSecond, FancyLightMixer* FancyLightMixer);
 
     CRGB *getFastLEDBuffer() const;
 
@@ -40,10 +43,14 @@ public:
 
     PlayerMode getMode() const;
     void setRandomMode();
+    void setFancyLightMode();
+    void setFancyLightMode(FancyLightPreset preset);
     void setPattern(uint8_t patternNumber);
     void setFixedPatternMode(AbstractPattern* pattern, uint16_t transitionTime = DEFAULT_TRANSITION_TIME);
-
     void setPower(bool power);
+
+    void setFancyLight(FancyLightMixer *fancyLight);
+
     bool getPower() const;
 
     virtual ~Player();
@@ -52,6 +59,7 @@ protected:
     void OnUpdate(uint32_t deltaTime) override;
 
 private:
+    FancyLightMixer* fancyLight;
     CRGB* buffer = NULL;
     uint32_t numLeds;
     PlayerMode mode = Mode_FixedPattern;

@@ -6,7 +6,7 @@
 #define RGBWPLAY_TRANSITIONER_H
 
 #include <FastLED.h>
-#define min(a,b) ((a)<(b)?(a):(b))
+#define MIN(X, Y) (((X)<(Y)) ? (X):(Y))
 
 
 
@@ -49,7 +49,7 @@ public:
 
 
         uint8_t cubicValue = ease8InOutCubic(linearValue);
-        return scale8(cubicValue, abs(from - to)) + min(from, to);
+        return scale8(cubicValue, abs(from - to)) + MIN(from, to);
     }
 
     CubicTransitioner() : Transitioner() {}

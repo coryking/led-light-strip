@@ -6,8 +6,9 @@
 #include "animations/patterns.h"
 #include "devices.h"
 
-Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
+Player::Player(uint32_t numLeds, uint8_t framesPerSecond, FancyLightMixer* fancyLightMixer) :
         numLeds(numLeds),
+        fancyLight(fancyLightMixer),
         Task(MsToTaskTime(1000/framesPerSecond))
 {
     offColor = new SolidColor(numLeds);
@@ -132,10 +133,32 @@ void Player::setFixedPatternMode(AbstractPattern* pattern,  uint16_t transitionT
 }
 
 void Player::setPattern(uint8_t patternNumber) {
-    if (patternNumber <= this->list->getNumPatterns()) {
-        this->mode = Mode_FixedPattern;
-        this->mixer->setNextPattern(
-                this->list->getPattern(patternNumber)
-        );
+    if(this->mode == Mode_FancyLightPattern) {
+        this->fancyLight->changePreset((FancyLightPreset)patternNumber);
+    } else {
+        if (patternNumber <= this->list->getNumPatterns()) {
+            this->mode = Mode_FixedPattern;
+            this->mixer->setNextPattern(
+                    this->list->getPattern(patternNumber)
+            );
+        }
     }
 }
+
+void Player::setFancyLightMode() {
+    if(this->getMode() != Mode_FancyLightPattern) {
+        this->mode = Mode_FancyLightPattern;
+        this->mixer->setNextPattern(this->fancyLight);
+    }
+}
+
+void Player::setFancyLightMode(FancyLightPreset preset) {
+    this->fancyLight->changePreset(preset);
+    this->setFancyLightMode();
+}
+
+void Player::setFancyLight(FancyLightMixer *fancyLight) {
+    Player::fancyLight = fancyLight;
+}
+
+

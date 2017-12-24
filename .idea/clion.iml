@@ -3,6 +3,7 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/MqttPubSub.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Player.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/MqttPubSub.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/RandomPatternList.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Playable.h" isTestSource="false" />
@@ -11,6 +12,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/animations/BpmPattern.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/Confetti.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/TestPattern.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/animations/NoisePlusPalette.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/MotionLight.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/FancyLight.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/AnnounceHour.cpp" isTestSource="false" />
@@ -21,18 +23,21 @@
       <sourceFolder url="file://$MODULE_DIR$/src/animations/MirrorPattern.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/PalettePattern.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/Confetti.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/animations/NoisyConfetti.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/ReversablePattern.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/Sinelon.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/AbstractPattern.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/patterns.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/RollingPattern.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/AbstractPattern.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/animations/NoisyConfetti.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/PalettePattern.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/JugglePattern.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/Rainbow.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/FireOnFireEscape.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/SolidColor.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/MotionLight.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/animations/NoisePlusPalette.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/Rainbow.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/TestPattern.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/animations/Noise.h" isTestSource="false" />
@@ -41,13 +46,14 @@
       <sourceFolder url="file://$MODULE_DIR$/src/animations/FirePattern.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/config.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Mixer.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/FancyLightMixer.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Player.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Commands.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/RemoteControl.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Transitioner.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/devices.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Player.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/FancyLightMixer.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Mixer.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Wifi.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeListsPrivate.txt" isTestSource="false" />
