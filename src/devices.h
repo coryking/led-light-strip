@@ -64,7 +64,7 @@
 #    warning "Nathan Babyroom Strip"
 
 
-#define LEDS_PER_STRIP 140
+#define LEDS_PER_STRIP 128
 #define NUM_STRIPS 4
 #define NUM_LEDS    LEDS_PER_STRIP * NUM_STRIPS
 
