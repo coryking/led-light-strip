@@ -1,6 +1,7 @@
 .pioenvs
 CMakeListsPrivate.txt
 .piolibdeps
+.idea
 **/.idea/workspace.xml
 **/.idea/tasks.xml
 
