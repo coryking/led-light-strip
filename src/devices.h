@@ -64,15 +64,11 @@
 #    warning "Nathan Babyroom Strip"
 
 
-#define LEDS_PER_STRIP 150
+#define LEDS_PER_STRIP 140
 #define NUM_STRIPS 4
 #define NUM_LEDS    LEDS_PER_STRIP * NUM_STRIPS
 
 #define MULTI_LED
-#define DATA_0_PIN D5
-#define DATA_1_PIN D6
-#define DATA_2_PIN D7
-#define DATA_3_PIN D8
 
 #define LED_TYPE SK6812
 #define DO_NOT_USE_WIFI
