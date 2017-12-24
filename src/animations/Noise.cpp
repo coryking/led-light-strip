@@ -21,7 +21,7 @@ uint16_t Noise::readFrame(CRGB *buffer, ulong time) {
     }
 }
 
-void Noise::newTargetPalette() {
+void ICACHE_FLASH_ATTR Noise::newTargetPalette() {
     targetPalette = CRGBPalette16(
                 CHSV(random8(), 255, random8(128,255)),
                 CHSV(random8(), 255, random8(128,255)),
@@ -35,11 +35,11 @@ Noise::Noise(uint16 numLeds) : AbstractPattern(numLeds) {
     dist = random16(12345);
 }
 
-void Noise::resetRuntime() {
+void ICACHE_FLASH_ATTR Noise::resetRuntime() {
     AbstractPattern::resetRuntime();
     minRuntime = DEFAULT_DURATION + random(0, DEFAULT_DURATION * 10);
 }
 
-void Noise::newVariant() {
+void ICACHE_FLASH_ATTR Noise::newVariant() {
     AbstractPattern::newVariant();
 }

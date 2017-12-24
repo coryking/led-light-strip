@@ -1,14 +1,21 @@
 //
-// Created by Cory King on 1/24/17.
+// Created by Cory King on 12/20/17.
 //
 
-#include "Confetti.h"
+#include "NoisyConfetti.h"
+#include "patterns.h"
 
-uint16_t Confetti::readFrame(CRGB *buffer, ulong time) {
-    HuePattern::readFrame(buffer, time);
+uint16_t NoisyConfetti::readFrame(CRGB *buffer, ulong time) {
+    HuePattern::readFrame(buffer,time);
 
-    // random colored speckles that blink in and fade smoothly
     fadeToBlackBy( buffer, getNumLeds(), confettiSpeeds[confettiSpeed].pieceDecayAmount);
+
+
+    for(int i=0; i < getNumLeds(); i++) {
+        if(random(0, 1000) < confettiSpeeds[confettiSpeed].numPixels && buffer[i] < CRGB(127,127,127))
+            buffer[i] = CHSV(random8(), random8(0, 25), random8(0, MAX_NOISE_BRIGHTNESS));
+    }
+
     if(nextConfettiPieceTime <= time) {
         int pos = random16(getNumLeds());
         buffer[pos] += CHSV(gHue + random8(64), 200, 255);
@@ -21,10 +28,11 @@ uint16_t Confetti::readFrame(CRGB *buffer, ulong time) {
     return getNumLeds();
 }
 
-Confetti::Confetti(uint16 numLeds) : HuePattern(numLeds) {
+NoisyConfetti::NoisyConfetti(uint16 numLeds) : HuePattern(numLeds) {
+
 }
 
-void ICACHE_FLASH_ATTR Confetti::newVariant() {
+void NoisyConfetti::newVariant() {
     HuePattern::newVariant();
     confettiSpeed++;
     if(confettiSpeed==confettiSpeeds.size())

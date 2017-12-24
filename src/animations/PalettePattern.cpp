@@ -53,7 +53,7 @@ PalettePattern::PalettePattern(uint16 numLeds, bool reverseDirection) : Reversab
 
 
 // This function fills the palette with totally random colors.
-void PalettePattern::SetupTotallyRandomPalette()
+void ICACHE_FLASH_ATTR PalettePattern::SetupTotallyRandomPalette()
 {
     for( int i = 0; i < 16; i++) {
         currentPalette[i] = CHSV( random8(), 255, random8());
@@ -64,7 +64,7 @@ void PalettePattern::SetupTotallyRandomPalette()
 // using code.  Since the palette is effectively an array of
 // sixteen CRGB colors, the various fill_* functions can be used
 // to set them up.
-void PalettePattern::SetupBlackAndWhiteStripedPalette()
+void ICACHE_FLASH_ATTR PalettePattern::SetupBlackAndWhiteStripedPalette()
 {
     // 'black out' all 16 palette entries...
     fill_solid( currentPalette, 16, CRGB::Black);
@@ -77,7 +77,7 @@ void PalettePattern::SetupBlackAndWhiteStripedPalette()
 }
 
 // This function sets up a palette of purple and green stripes.
-void PalettePattern::SetupPurpleAndGreenPalette()
+void ICACHE_FLASH_ATTR PalettePattern::SetupPurpleAndGreenPalette()
 {
     CRGB purple = CHSV( HUE_PURPLE, 255, 255);
     CRGB green  = CHSV( HUE_GREEN, 255, 255);
@@ -95,7 +95,7 @@ void PalettePattern::SetupPurpleAndGreenPalette()
 // which is stored in PROGMEM (flash), which is almost always more
 // plentiful than RAM.  A static PROGMEM palette like this
 // takes up 64 bytes of flash.
-const TProgmemPalette16 PalettePattern::myRedWhiteBluePalette_p PROGMEM =
+const  TProgmemPalette16 PalettePattern::myRedWhiteBluePalette_p PROGMEM =
         {
                 CRGB::Red,
                 CRGB::Gray, // 'white' is too bright compared to red and blue

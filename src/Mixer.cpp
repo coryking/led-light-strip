@@ -39,7 +39,7 @@ Mixer::Mixer(uint16_t numLeds) : Playable(numLeds) {
     this->oldPatternBuffer = (CRGB*)malloc(sizeof(CRGB) * numLeds);
 }
 
-void Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime) {
+void ICACHE_FLASH_ATTR Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime) {
     syslog.log(LOG_INFO, "setting next pattern...");
     if(nextPattern == NULL) {
         return;
@@ -67,7 +67,7 @@ Mixer::~Mixer() {
     free(this->oldPatternBuffer);
 }
 
-void Mixer::transitionToSteadyState() {
+void ICACHE_FLASH_ATTR Mixer::transitionToSteadyState() {
     syslog.log(LOG_INFO, "t to ss");
     this->oldPattern = NULL;
     this->state = MIXER_STEADY_STATE;
