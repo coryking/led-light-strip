@@ -35,10 +35,10 @@
 #    warning "Bedroom Strip"
 
 #define NUM_LEDS 180
-//#define FASTLED_RGBW
+#define FASTLED_RGBW
 #define FASTLED_ESP8266_DMA
 #define DATA_PIN D2
-#define LED_TYPE SK6812_RGBW
+#define LED_TYPE SK6812
 #define HAS_IR_REMOTE
 #define IR_REMOTE_PIN D5
 #define DEBUG_LOOP_TIMING
