@@ -3,6 +3,10 @@
 //
 
 #include "BurbleBabble.h"
+#include "patterns.h"
+
+#define MAX(A, B) (( (A) > (B) ) ? (A) : (B))
+#define MIN(X,Y) (((X)<(Y)) ? (X):(Y))
 
 BurbleBabble::BurbleBabble(uint16 numLeds) : Noise(numLeds) {
 
@@ -36,7 +40,7 @@ uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
     // random colored speckles that blink in and fade smoothly
     for(int i = 0; i < getNumLeds(); i++) {
         nblend(buffer[i], confetti[i],confettiOpacity[i]);
-        confettiOpacity[i] = qsub8(confettiOpacity[i], confettiSpeeds[confettiSpeed].pieceDecayAmount);
+        confettiOpacity[i] = qsub8(confettiOpacity[i], pieceDecayAmount);
     }
     if(nextConfettiPieceTime <= time) {
         int pos = random16(getNumLeds());
@@ -46,8 +50,8 @@ uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
         nextConfettiPieceTime =
                 time +
                 random8(
-                        confettiSpeeds[confettiSpeed].pieceMinTime,
-                        confettiSpeeds[confettiSpeed].pieceMaxTime);
+                        pieceMinTime,
+                        pieceMaxTime);
     }
     return getNumLeds();
 
@@ -66,14 +70,17 @@ void BurbleBabble::newTargetPalette() {
 }
 
 uint8_t BurbleBabble::getHue(bool invert) {
-    uint8_t inv = invert ? -180 : 0;
-    return(random8(lowHue + inv, highHue + inv));
+    uint8_t inv = invert ? 180 : 0;
+    uint8_t m = MIN(confettiHues[currentHues].minHue - inv, confettiHues[currentHues].maxHue - inv);
+    uint8_t ma = MAX(confettiHues[currentHues].minHue - inv, confettiHues[currentHues].maxHue - inv);
+    return(random8(m,ma));
 }
 
 void BurbleBabble::newVariant() {
     Noise::newVariant();
-    confettiSpeed++;
-    if(confettiSpeed==confettiSpeeds.size())
-        confettiSpeed=0;
+    currentHues++;
+    if(currentHues==confettiHues.size())
+        currentHues=0;
     nextConfettiPieceTime=0;
+    newTargetPalette();
 }

@@ -14,10 +14,9 @@
 class BurbleBabble : public Noise {
 public:
     typedef struct {
-        uint8_t pieceMinTime;
-        uint8_t pieceMaxTime;
-        uint8_t pieceDecayAmount;
-    } ConfettiNoiseTime;
+        uint8_t minHue;
+        uint8_t maxHue;
+    } ConfettiHue;
 
     BurbleBabble(uint16 numLeds);
 
@@ -35,17 +34,25 @@ protected:
     void newTargetPalette() override;
     uint8_t getHue(bool invert=false);
 private:
-    const uint8_t lowHue = HUE_YELLOW;
-    const uint8_t highHue = HUE_GREEN;
+    uint8_t lowHue = HUE_YELLOW;
+    uint8_t highHue = HUE_GREEN;
+
+    const uint8_t pieceMinTime=0;
+    const uint8_t pieceMaxTime=0;
+    const uint8_t pieceDecayAmount=10;
 
     CRGB *confetti=NULL;
     uint8_t *confettiOpacity = NULL;
 
-    uint8_t confettiSpeed = 0;
-    std::vector<ConfettiNoiseTime> confettiSpeeds = {
-            {0, 0, 10},
-            {3, 10, 5},
-            {15, 35, 3}
+    uint8_t currentHues = 0;
+    std::vector<ConfettiHue> confettiHues = {
+            {HUE_YELLOW, HUE_GREEN},
+            {HUE_PURPLE, HUE_PINK},
+            {HUE_BLUE, HUE_PURPLE},
+            {HUE_RED, HUE_ORANGE},
+            {HUE_GREEN, HUE_AQUA},
+            {HUE_GREEN, HUE_AQUA},
+
     };
     uint64_t nextConfettiPieceTime = 0;
 
