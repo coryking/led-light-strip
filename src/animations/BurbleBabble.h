@@ -29,6 +29,8 @@ public:
 
     uint16_t readFrame(CRGB *buffer, ulong time) override;
 
+    void newVariant() override;
+
 protected:
     void newTargetPalette() override;
     uint8_t getHue(bool invert=false);

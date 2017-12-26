@@ -40,7 +40,7 @@ uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
     }
     if(nextConfettiPieceTime <= time) {
         int pos = random16(getNumLeds());
-        confetti[pos] += CHSV(getHue(true), 200, random8(128, 255));
+        confetti[pos] = CHSV(getHue(true), random8(200,255), 255);
         confettiOpacity[pos] = 255;
 
         nextConfettiPieceTime =
@@ -68,4 +68,12 @@ void BurbleBabble::newTargetPalette() {
 uint8_t BurbleBabble::getHue(bool invert) {
     uint8_t inv = invert ? -180 : 0;
     return(random8(lowHue + inv, highHue + inv));
+}
+
+void BurbleBabble::newVariant() {
+    Noise::newVariant();
+    confettiSpeed++;
+    if(confettiSpeed==confettiSpeeds.size())
+        confettiSpeed=0;
+    nextConfettiPieceTime=0;
 }
