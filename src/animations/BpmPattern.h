@@ -27,7 +27,7 @@ public:
         uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
 
         for( int i = 0; i < getNumLeds(); i++) { //9948
-            buffer[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*INVERSE_WIDTH));
+            buffer[i] = ColorFromPalette(palette, getHue()+(i*2), beat-getHue()+(i*INVERSE_WIDTH));
         }
     }
 

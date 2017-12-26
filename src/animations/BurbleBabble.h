@@ -7,16 +7,17 @@
 
 #include <FastLED.h>
 #include <vector>
-#include "AbstractPattern.h"
 #include "Noise.h"
+
+
 
 class BurbleBabble : public Noise {
 public:
     typedef struct {
-        uint8_t hue;
-        uint8_t opacity;
-    } ConfettiNoise;
-
+        uint8_t pieceMinTime;
+        uint8_t pieceMaxTime;
+        uint8_t pieceDecayAmount;
+    } ConfettiNoiseTime;
 
     BurbleBabble(uint16 numLeds);
 
@@ -35,7 +36,16 @@ private:
     const uint8_t lowHue = HUE_YELLOW;
     const uint8_t highHue = HUE_GREEN;
 
-    ConfettiNoise *noise=NULL;
+    CRGB *noise=NULL;
+    uint8_t *noiseOpacity = NULL:
+
+    uint8_t confettiSpeed = 0;
+    std::vector<ConfettiNoiseTime> confettiSpeeds = {
+            {0, 0, 10},
+            {3, 10, 5},
+            {15, 35, 3}
+    };
+    uint64_t nextConfettiPieceTime = 0;
 
 };
 

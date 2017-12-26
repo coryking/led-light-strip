@@ -79,12 +79,19 @@ public:
 };
 
 class HuePattern : public AbstractPattern {
-protected:
+private:
+    uint8_t gHue = 0;
     const uint16_t minHueDelay = 15;
     const uint16_t maxHueDelay = 100;
-    uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+
+    // rotating "base color" used by many of the patterns
     uint8_t gHueDelay = 20;
     void newHueDelay() { gHueDelay = random(minHueDelay, maxHueDelay); }
+protected:
+
+    virtual uint8_t getHue() const {
+        return gHue;
+    }
 
 public:
     virtual uint16_t readFrame(CRGB *buffer, ulong time) {

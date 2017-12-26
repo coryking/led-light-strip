@@ -18,7 +18,7 @@ uint16_t NoisyConfetti::readFrame(CRGB *buffer, ulong time) {
 
     if(nextConfettiPieceTime <= time) {
         int pos = random16(getNumLeds());
-        buffer[pos] += CHSV(gHue + random8(64), 200, 255);
+        buffer[pos] += CHSV(getHue() + random8(64), 200, 255);
         nextConfettiPieceTime =
                 time +
                 random8(

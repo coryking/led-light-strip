@@ -25,7 +25,7 @@ public:
         for( int i = 0; i < getNumLeds(); i++) { //9948
             uint8_t brightness = 255; // abs(127 - (beat - gHue + (i * INVERSE_WIDTH)) % 255);
 
-            buffer[i] = ColorFromPalette(palette, gHue+(i), brightness);
+            buffer[i] = ColorFromPalette(palette, getHue()+(i), brightness);
         }
     }
 

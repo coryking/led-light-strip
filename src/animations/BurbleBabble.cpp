@@ -11,13 +11,19 @@ BurbleBabble::BurbleBabble(uint16 numLeds) : Noise(numLeds) {
 void BurbleBabble::beginAnimation() {
     Noise::beginAnimation();
     if(noise==NULL)
-        noise = (ConfettiNoise*)malloc(sizeof(ConfettiNoise) * getNumLeds());
+        noise = (CRGB*)malloc(sizeof(CRGB) * getNumLeds());
+
+    if(noiseOpacity==NULL)
+        noiseOpacity = (uint8_t*)malloc(sizeof(uint8_t) * getNumLeds());
 }
 
 void BurbleBabble::endAnimation() {
     Noise::endAnimation();
     if(noise!=NULL)
         free(noise);
+
+    if(noiseOpacity!=NULL)
+        free(noiseOpacity);
 }
 
 uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {

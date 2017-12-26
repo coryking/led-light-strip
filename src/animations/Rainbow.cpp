@@ -7,7 +7,7 @@
 
 uint16_t Rainbow::readFrame(CRGB *buffer, ulong time) {
     HuePattern::readFrame(buffer,time);
-    fill_rainbow( buffer, getNumLeds(), gHue, 7);
+    fill_rainbow( buffer, getNumLeds(), getHue(), 7);
     return getNumLeds();
 }
 

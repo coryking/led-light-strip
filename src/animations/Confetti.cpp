@@ -11,7 +11,7 @@ uint16_t Confetti::readFrame(CRGB *buffer, ulong time) {
     fadeToBlackBy( buffer, getNumLeds(), confettiSpeeds[confettiSpeed].pieceDecayAmount);
     if(nextConfettiPieceTime <= time) {
         int pos = random16(getNumLeds());
-        buffer[pos] += CHSV(gHue + random8(64), 200, 255);
+        buffer[pos] += CHSV(getHue() + random8(64), 200, 255);
         nextConfettiPieceTime =
                 time +
                 random8(
