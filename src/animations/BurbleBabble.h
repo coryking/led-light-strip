@@ -36,8 +36,8 @@ private:
     const uint8_t lowHue = HUE_YELLOW;
     const uint8_t highHue = HUE_GREEN;
 
-    CRGB *noise=NULL;
-    uint8_t *noiseOpacity = NULL:
+    CRGB *confetti=NULL;
+    uint8_t *confettiOpacity = NULL;
 
     uint8_t confettiSpeed = 0;
     std::vector<ConfettiNoiseTime> confettiSpeeds = {
