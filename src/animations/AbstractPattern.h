@@ -62,6 +62,17 @@ public:
     }
 
     /***
+     * start the animation sequence.  Load any memory, etc...
+     */
+    virtual void beginAnimation() {}
+
+    /***
+     * end the animation sequence.  free any memory, etc...
+     */
+    virtual void endAnimation() {}
+
+
+    /***
      * Switch to a new variation of this pattern.....
      */
     virtual void newVariant() {}

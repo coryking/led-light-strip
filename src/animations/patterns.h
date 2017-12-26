@@ -20,6 +20,7 @@
 #include "RollingPattern.h"
 #include "MirrorPattern.h"
 #include "NoisyConfetti.h"
+#include "BurbleBabble.h"
 //#include "NoisePlusPalette.h"
 
 #endif //NEOPIXELLEDCONTROLLER_PATTERNS_H

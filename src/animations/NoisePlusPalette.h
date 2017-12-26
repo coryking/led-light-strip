@@ -17,6 +17,10 @@ public:
 
     uint16_t readFrame(CRGB *buffer, ulong time) override;
 
+    void beginAnimation() override;
+
+    void endAnimation() override;
+
 protected:
     uint8_t kMatrixWidth  = 16;
     const uint8_t kMatrixHeight = 1;
@@ -41,7 +45,7 @@ protected:
     uint16_t scale = 30; // scale is set dynamically once we've started up
 
     // This is the array that we keep our computed noise values in
-    uint8_t *noise;
+    uint8_t *noise = NULL;
 
     CRGBPalette16 currentPalette;
     uint8_t       colorLoop = 1;

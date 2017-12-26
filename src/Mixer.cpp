@@ -52,6 +52,7 @@ void ICACHE_FLASH_ATTR Mixer::setNextPattern(AbstractPattern *nextPattern, uint1
 
     this->oldPattern = this->currentPattern;
     this->currentPattern = nextPattern;
+    this->currentPattern->beginAnimation();
     this->currentPattern->resetRuntime();
 
     //memcpy(this->oldPatternBuffer, this->currentPatternBuffer, sizeof(CRGB) * getNumLeds());
@@ -69,6 +70,7 @@ Mixer::~Mixer() {
 
 void ICACHE_FLASH_ATTR Mixer::transitionToSteadyState() {
     syslog.log(LOG_INFO, "t to ss");
+    this->oldPattern->endAnimation();
     this->oldPattern = NULL;
     this->state = MIXER_STEADY_STATE;
 }

@@ -13,11 +13,11 @@ private:
     uint16_t  dist;
     uint16_t  scale=30;
     uint8_t maxChanges = 48;
-    CRGBPalette16 currentPalette; //(CRGB::Black);
-    CRGBPalette16 targetPalette; //(OceanColors_p);
     uint16_t  minRuntime = DEFAULT_DURATION;
 protected:
-    void newTargetPalette();
+    CRGBPalette16 currentPalette;
+    CRGBPalette16 targetPalette;
+    virtual void newTargetPalette();
 
 public:
     virtual uint16_t readFrame(CRGB *buffer, ulong time);
