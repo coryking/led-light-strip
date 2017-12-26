@@ -28,7 +28,7 @@ Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
                new Confetti(numLeds),
                new Noise(numLeds),
                new JugglePattern(numLeds),
-               new RollingPattern(numLeds, OceanColors_p),
+               new BurbleBabble(numLeds),
                new RollingPattern(numLeds, CloudColors_p),
                new BpmPattern(numLeds),
                //new NoisePlusPalette(numLeds),

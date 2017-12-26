@@ -31,7 +31,7 @@ public:
 
 protected:
     void newTargetPalette() override;
-
+    uint8_t getHue(bool invert=false);
 private:
     const uint8_t lowHue = HUE_YELLOW;
     const uint8_t highHue = HUE_GREEN;

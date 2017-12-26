@@ -33,6 +33,24 @@ uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
         return 0;
 
 
+    // random colored speckles that blink in and fade smoothly
+    for(int i = 0; i < getNumLeds(); i++) {
+        nblend(buffer[i], confetti[i],confettiOpacity[i]);
+        confettiOpacity[i] = qsub8(confettiOpacity[i], confettiSpeeds[confettiSpeed].pieceDecayAmount);
+    }
+    if(nextConfettiPieceTime <= time) {
+        int pos = random16(getNumLeds());
+        confetti[pos] += CHSV(getHue(true), 200, random8(128, 255));
+        confettiOpacity[pos] = 255;
+
+        nextConfettiPieceTime =
+                time +
+                random8(
+                        confettiSpeeds[confettiSpeed].pieceMinTime,
+                        confettiSpeeds[confettiSpeed].pieceMaxTime);
+    }
+    return getNumLeds();
+
 }
 
 BurbleBabble::~BurbleBabble() {
@@ -41,8 +59,13 @@ BurbleBabble::~BurbleBabble() {
 
 void BurbleBabble::newTargetPalette() {
     targetPalette = CRGBPalette16(
-            CHSV(random8(lowHue, highHue), 255, random8(128,255)),
-            CHSV(random8(lowHue, highHue), 255, random8(128,255)),
-            CHSV(random8(lowHue, highHue), 192, random8(128,255)),
-            CHSV(random8(lowHue, highHue), 255, random8(128,255)));
+            CHSV(getHue(), 255, random8(128,255)),
+            CHSV(getHue(), 255, random8(128,255)),
+            CHSV(getHue(), 192, random8(128,255)),
+            CHSV(getHue(), 255, random8(128,255)));
+}
+
+uint8_t BurbleBabble::getHue(bool invert) {
+    uint8_t inv = invert ? -180 : 0;
+    return(random8(lowHue + inv, highHue + inv));
 }
