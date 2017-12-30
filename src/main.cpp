@@ -137,7 +137,7 @@ void didConnectMQTT() {
     mqttPubSub.publishBrightness(brightness.getBrightness());
     mqttPubSub.publishPower(player.getPower());
     mqttPubSub.publishHSV(ledColorValue);
-    mqttPubSub.publishRandom(player.getMode() == PlayerMode::Mode_RandomPattern ? true : false);
+    mqttPubSub.publishRandom(player.getMode() == PlayerMode::Mode_RandomPattern);
 }
 
 #endif

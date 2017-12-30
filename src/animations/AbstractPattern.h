@@ -9,7 +9,7 @@
 #include <FastLED.h>
 #include "Playable.h"
 
-#define DEFAULT_DURATION 3 * 60 * 1000
+#define DEFAULT_DURATION (3 * 60 * 1000)
 
 #define FIRST_LED_OFFSET 1
 #define FIRST_LED_LENGTH 56
@@ -40,7 +40,7 @@ public:
      */
     //virtual uint16_t readFrame(CRGB * buffer, ulong time) = 0;
 
-    AbstractPattern(uint16 numLeds) : Playable(numLeds) {
+    explicit AbstractPattern(uint16 numLeds) : Playable(numLeds) {
         _startTime = millis();
     }
 
@@ -94,23 +94,23 @@ protected:
     }
 
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time) {
+    uint16_t readFrame(CRGB *buffer, ulong time) override {
         EVERY_N_MILLISECONDS(gHueDelay) {
             gHue++;
         }
     }
 
-    virtual void resetRuntime() {
+    void resetRuntime() override {
         newHueDelay();
 
         AbstractPattern::resetRuntime();
     }
 
-    virtual void newVariant() override {
+    void newVariant() override {
 
     }
 
-    HuePattern(uint16 numLeds) : AbstractPattern(numLeds) {
+    explicit HuePattern(uint16 numLeds) : AbstractPattern(numLeds) {
         gHue = random(0,255);
         newHueDelay();
     }

@@ -10,17 +10,17 @@
 
 #define EACH_TEST_TIME 1
 #define NUM_TESTS 5
-#define TEST_RUNTIME EACH_TEST_TIME * NUM_TESTS * 1000
+#define TEST_RUNTIME (EACH_TEST_TIME * NUM_TESTS * 1000)
 
 class TestPattern : public AbstractPattern {
 private:
-    virtual uint16_t getMinRuntime() {
+    uint16_t getMinRuntime() override {
         return TEST_RUNTIME;
     }
 public:
-    TestPattern(uint16 numLeds);
+    explicit TestPattern(uint16 numLeds);
 
-    virtual uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
 };
 
 

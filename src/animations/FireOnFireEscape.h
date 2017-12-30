@@ -19,7 +19,7 @@ private:
     ReversablePattern* rightFrontFire;
     ReversablePattern* rightFire;
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time) {
+    uint16_t readFrame(CRGB *buffer, ulong time) override {
         /* for (auto & element : _lightStrings) {
             CRGB* bufferPos = buffer + element.offset;
             element.pattern->readFrame(bufferPos, time);
@@ -46,7 +46,7 @@ public:
 
     }
 
-    FireOnFireEscape(uint16 numLeds) : AbstractPattern(numLeds) {
+    explicit FireOnFireEscape(uint16 numLeds) : AbstractPattern(numLeds) {
         const uint16 middleLedCount = (CORNER_2 - CORNER_1) / 2;
         Serial.println(middleLedCount);
 //        this->_lightStrings.push_back({new T(CORNER_1, true), 0, CORNER_1});

@@ -17,7 +17,7 @@ protected:
     uint8_t BeatsPerMinute = 62;
 
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time) {
+    uint16_t readFrame(CRGB *buffer, ulong time) override {
 
         HuePattern::readFrame(buffer,time);
 
@@ -29,7 +29,7 @@ public:
         }
     }
 
-    virtual ICACHE_FLASH_ATTR void resetRuntime() {
+    ICACHE_FLASH_ATTR void resetRuntime() override {
         HuePattern::resetRuntime();
         BeatsPerMinute = random(50, 80);
     }

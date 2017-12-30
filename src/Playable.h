@@ -11,7 +11,7 @@
 
 class Playable {
 public:
-    Playable(uint16_t numLeds) : _numLeds(numLeds) {}
+    explicit Playable(uint16_t numLeds) : _numLeds(numLeds) {}
     /**
  * Read pixels from this AbstractPattern
  * @param buffer Buffer to read into

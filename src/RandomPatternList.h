@@ -15,7 +15,8 @@ class RandomPatternList {
 public:
     RandomPatternList() : RandomPatternList(PatternList()) {}
 
-    RandomPatternList(PatternList patterns) : patterns(patterns) {
+    explicit RandomPatternList(PatternList patterns) {
+        this->addPatterns(patterns);
         syslog.logf(LOG_INFO, "%d patterns", patterns.size());
     }
 
@@ -29,8 +30,8 @@ public:
         }
     }
     AbstractPattern * getRandomPattern() {
-        if(this->patterns.size() == 0)
-            return NULL;
+        if(this->patterns.empty())
+            return nullptr;
 
         uint8_t element = random8(this->patterns.size() - 1);
         return this->patterns[element];

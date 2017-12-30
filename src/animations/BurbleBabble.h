@@ -18,7 +18,7 @@ public:
         uint8_t maxHue;
     } ConfettiHue;
 
-    BurbleBabble(uint16 numLeds);
+    explicit BurbleBabble(uint16 numLeds);
 
     void beginAnimation() override;
 
@@ -41,8 +41,8 @@ private:
     const uint8_t pieceMaxTime=0;
     const uint8_t pieceDecayAmount=10;
 
-    CRGB *confetti=NULL;
-    uint8_t *confettiOpacity = NULL;
+    CRGB *confetti= nullptr;
+    uint8_t *confettiOpacity = nullptr;
 
     uint8_t currentHues = 0;
     std::vector<ConfettiHue> confettiHues = {

@@ -19,10 +19,10 @@ private:
     uint16_t location;
 
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
     Direction getDirection();
     Direction setDirection(Direction dir);
-    MotionLight(uint16 numLeds);
+    explicit MotionLight(uint16 numLeds);
 
     uint16_t getPosition(int16_t offset);
 };

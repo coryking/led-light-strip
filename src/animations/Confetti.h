@@ -17,9 +17,9 @@ typedef struct {
 
 class Confetti : public HuePattern {
 public:
-    uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
 
-    Confetti(uint16 numLeds);
+    explicit Confetti(uint16 numLeds);
 
     void newVariant() override;
 

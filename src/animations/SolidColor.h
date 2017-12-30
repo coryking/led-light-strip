@@ -15,7 +15,7 @@ public:
         return getNumLeds();
     }
 
-    SolidColor(uint16_t numLeds) : AbstractPattern(numLeds) {
+    explicit SolidColor(uint16_t numLeds) : AbstractPattern(numLeds) {
 
     }
 

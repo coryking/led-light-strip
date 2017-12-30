@@ -9,9 +9,9 @@
 
 class Rainbow: public HuePattern {
 public:
-    Rainbow(uint16 numLeds);
+    explicit Rainbow(uint16 numLeds);
 
-    virtual uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
 };
 
 #endif //NEOPIXELLEDCONTROLLER_RAINBOW_H

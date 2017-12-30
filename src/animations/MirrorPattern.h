@@ -25,7 +25,7 @@ private:
     uint16_t middleLedPosition;
 
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time) {
+    uint16_t readFrame(CRGB *buffer, ulong time) override {
         /* for (auto & element : _lightStrings) {
             CRGB* bufferPos = buffer + element.offset;
             element.pattern->readFrame(bufferPos, time);
@@ -42,7 +42,7 @@ public:
 
     }
 
-    MirrorPattern(uint16 numLeds) : AbstractPattern(numLeds) {
+    explicit MirrorPattern(uint16 numLeds) : AbstractPattern(numLeds) {
         middleLedPosition = numLeds / 2;
         leftPattern = new T(middleLedPosition, false);
         rightPattern = new T(middleLedPosition, true);

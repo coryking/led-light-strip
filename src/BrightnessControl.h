@@ -13,11 +13,11 @@
 
 class BrightnessControl : public Task {
 public:
-    BrightnessControl(uint32_t timeInterval) : Task(timeInterval) {
-
+    explicit BrightnessControl(uint32_t timeInterval) : Task(timeInterval) {
+        this->oldBrightness = this->brightness = FastLED.getBrightness();
     }
 
-    void setBrightness(uint8_t brightness, boolean noDelay = false) {
+    void setBrightness(uint8_t brightness, bool noDelay = false) {
         uint64_t t = millis();
         syslog.logf(LOG_INFO, "b to %d (%d)", brightness, FastLED.getBrightness());
         Serial.printf("b to %d (%d)\n", brightness, FastLED.getBrightness());

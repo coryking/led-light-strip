@@ -29,13 +29,13 @@ public:
 
     void setSaturation(uint8_t saturation);
 
-    virtual uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
 
-    FancyLight(uint16 numLeds);
+    explicit FancyLight(uint16 numLeds);
 
-    virtual void resetRuntime();
+    void resetRuntime() override;
 
-    virtual uint16_t getMinRuntime() {
+    uint16_t getMinRuntime() override {
         return minRuntime;
     }
 

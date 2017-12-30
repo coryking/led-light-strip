@@ -108,7 +108,7 @@ private:
 
 
 
-    void setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, byte *payload, unsigned int length, int ol, int oh);
+    void setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, const byte *payload, unsigned int length, int ol, int oh);
     void intRangeToChar(uint16_t in, uint16_t il, uint16_t ih, uint16_t ol, uint16_t oh, char* outBuff);
 
 };

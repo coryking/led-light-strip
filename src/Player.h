@@ -31,7 +31,7 @@ typedef enum {
 
 class Player : public Task {
 public:
-    Player(uint32_t numLeds) : Player(numLeds, FRAMES_PER_SECOND) {}
+    explicit Player(uint32_t numLeds) : Player(numLeds, FRAMES_PER_SECOND) {}
 
     Player(uint32_t numLeds, uint8_t framesPerSecond);
 
@@ -57,7 +57,7 @@ protected:
     void OnUpdate(uint32_t deltaTime) override;
 
 private:
-    CRGB *buffer = NULL;
+    CRGB *buffer = nullptr;
     uint32_t numLeds;
     PlayerMode mode = Mode_FixedPattern;
     PlayerMode savedMode;

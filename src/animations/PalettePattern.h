@@ -28,7 +28,7 @@ private:
 
 
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
 
     PalettePattern(uint16 numLeds, bool reverseDirection);
 
