@@ -23,17 +23,21 @@ void BurbleBabble::beginAnimation() {
 
 void BurbleBabble::endAnimation() {
     Noise::endAnimation();
-    if(confetti!=NULL)
+    if(confetti!=NULL) {
         free(confetti);
+        confetti = NULL;
+    }
 
-    if(confettiOpacity!=NULL)
+    if(confettiOpacity!=NULL) {
         free(confettiOpacity);
+        confettiOpacity = NULL;
+    }
 }
 
 uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
     Noise::readFrame(buffer, time);
 
-    if(confetti==NULL)
+    if(confetti==NULL || confettiOpacity==NULL)
         return 0;
 
 

@@ -36,6 +36,7 @@ void Mixer::readTransitionFrame(CRGB*buffer, ulong time) {
 
 Mixer::Mixer(uint16_t numLeds) : Playable(numLeds) {
     this->currentPattern = new SolidColor(numLeds);
+    this->currentPattern->beginAnimation();
     this->oldPatternBuffer = (CRGB*)malloc(sizeof(CRGB) * numLeds);
 }
 
@@ -70,8 +71,10 @@ Mixer::~Mixer() {
 
 void ICACHE_FLASH_ATTR Mixer::transitionToSteadyState() {
     syslog.log(LOG_INFO, "t to ss");
-    this->oldPattern->endAnimation();
-    this->oldPattern = NULL;
+    if(this->oldPattern != NULL) {
+        this->oldPattern->endAnimation();
+        this->oldPattern = NULL;
+    }
     this->state = MIXER_STEADY_STATE;
 }
 
