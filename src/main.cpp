@@ -9,25 +9,25 @@
 //#define DEBUG_ESP_PORT Serial
 #define OTA_DEBUG Serial
 #define DEBUGV Serial.println
+
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <FastLED.h>
 #include <Task.h>
 #include <WiFiUdp.h>
-#include <Syslog.h>
 
 #include "config.h"
 #include "animations/FancyLight.h"
 
 #include "Wifi.h"
+
 #ifndef DO_NOT_USE_WIFI
+
 #include "MqttPubSub.h"
-#include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
+
 #endif
 
-#include "Mixer.h"
-#include "RandomPatternList.h"
 #include "Player.h"
 #include "BrightnessControl.h"
 #include "RemoteControl.h"
@@ -42,7 +42,7 @@
 // Define the array of leds
 //CRGB leds[NUM_LEDS];
 
-CHSV ledColorValue = CHSV(0,0,HSV_BRIGHTNESS);
+CHSV ledColorValue = CHSV(0, 0, HSV_BRIGHTNESS);
 
 #ifndef DO_NOT_USE_WIFI
 MqttPubSub mqttPubSub(MQTT_SERVER, MQTT_PORT);
@@ -74,16 +74,20 @@ char hostString[16] = {0};
 long lastWifiReconnectAttempt = 0;
 
 void readFromEEPROM();
+
 void writeToEEPROM();
 
 void ICACHE_FLASH_ATTR showStats(uint32_t deltaTime);
+
 FunctionTask taskShowStats(showStats, MsToTaskTime(10000));
 
 void ICACHE_FLASH_ATTR showRetries(uint32_t deltaTime);
+
 FunctionTask taskShowRetries(showRetries, MsToTaskTime(30000));
 
 void ICACHE_FLASH_ATTR showNewColor() {
-    Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
+    Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v,
+                  FastLED.getBrightness());
     fancyLightPattern.setHue(ledColorValue.h);
     fancyLightPattern.setSaturation(ledColorValue.s);
     fancyLightPattern.changePalette();
@@ -110,7 +114,7 @@ void ICACHE_FLASH_ATTR setPowerCb(bool power) {
 }
 
 void ICACHE_FLASH_ATTR setRandomCb(bool randomState) {
-    if(randomState) {
+    if (randomState) {
         player.setRandomMode();
     } else {
         player.setFixedPatternMode(&fancyLightPattern);
@@ -122,6 +126,7 @@ void ICACHE_FLASH_ATTR setRandomCb(bool randomState) {
 #ifndef DO_NOT_USE_WIFI
 
 void onMonitorWifi(uint32_t deltaTime);
+
 FunctionTask taskMonitorWifi(onMonitorWifi, MsToTaskTime(1000));
 
 void onHandleOTA(uint32_t deltaTime);
@@ -134,12 +139,13 @@ void didConnectMQTT() {
     mqttPubSub.publishHSV(ledColorValue);
     mqttPubSub.publishRandom(player.getMode() == PlayerMode::Mode_RandomPattern ? true : false);
 }
+
 #endif
 
 void ICACHE_FLASH_ATTR remoteCallback(RemoteButtons buttons) {
     syslog.logf(LOG_INFO, "Button [%i]\n", buttons);
     Serial.printf("Button [%i]\n", buttons);
-    switch(buttons) {
+    switch (buttons) {
         case BUTTON_OK:
             player.setPower(!player.getPower());
             break;
@@ -167,7 +173,7 @@ void ICACHE_FLASH_ATTR remoteCallback(RemoteButtons buttons) {
         case BUTTON_9:
             // power up no matter what....
             player.setPower(true);
-            player.setPattern((uint8_t)buttons);
+            player.setPattern((uint8_t) buttons);
 
             break;
 
@@ -178,7 +184,7 @@ void ICACHE_FLASH_ATTR remoteCallback(RemoteButtons buttons) {
 
 void setup() {
     Serial.begin(9600);
-    EEPROM.begin(sizeof(CHSV) + 2*sizeof(uint8_t));
+    EEPROM.begin(sizeof(CHSV) + 2 * sizeof(uint8_t));
     sprintf(hostString, "ESP_%06X", ESP.getChipId());
     Serial.println();
     Serial.println(hostString);
@@ -202,12 +208,12 @@ void setup() {
     // TODO: FIX THIS!!!
     //FastLED.setDither(0);
 
-    FastLED.setCorrection( TypicalLEDStrip );
+    FastLED.setCorrection(TypicalLEDStrip);
 
-    if(EEPROM.read(0) != 255) {
+    if (EEPROM.read(0) != 255) {
         syslog.log(LOG_INFO, "Nothing in EEPROM");
         brightness.setBrightness(DEFAULT_BRIGHTNESS);
-        ledColorValue = CHSV(0,0,HSV_BRIGHTNESS);
+        ledColorValue = CHSV(0, 0, HSV_BRIGHTNESS);
         writeToEEPROM();
     } else {
         syslog.log(LOG_INFO, "Reading from EEPROM");
@@ -218,11 +224,11 @@ void setup() {
 
 #ifndef DO_NOT_USE_WIFI
     mqttPubSub
-        .setLightHueCallback(setHueCb)
-        ->setLightBrightnessCallback(setBrightnessCb)
-        ->setLightSaturationCallback(setSaturationCb)
-        ->setLightRandomCallback(setRandomCb)
-        ->setLightPowerCallback(setPowerCb);
+            .setLightHueCallback(setHueCb)
+            ->setLightBrightnessCallback(setBrightnessCb)
+            ->setLightSaturationCallback(setSaturationCb)
+            ->setLightRandomCallback(setRandomCb)
+            ->setLightPowerCallback(setPowerCb);
 
     mqttPubSub.setReconnectCallback(didConnectMQTT);
     taskManager.StartTask(&taskMonitorWifi);
@@ -253,20 +259,22 @@ void setup() {
 void ICACHE_FLASH_ATTR readFromEEPROM() {
     brightness.setBrightness(EEPROM.read(1));
     ledColorValue = EEPROM.get(2, ledColorValue);
-    auto mode = (PlayerMode)EEPROM.read(3);
-    if(mode != player.getMode()) {
-        if(mode == PlayerMode::Mode_FixedPattern) {
+    auto mode = (PlayerMode) EEPROM.read(3);
+    if (mode != player.getMode()) {
+        if (mode == PlayerMode::Mode_FixedPattern) {
             player.setFixedPatternMode(&fancyLightPattern);
         } else {
             player.setRandomMode();
         }
     }
-    syslog.logf(LOG_INFO, "from eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, FastLED.getBrightness());
+    syslog.logf(LOG_INFO, "from eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s,
+                ledColorValue.v, FastLED.getBrightness());
 }
 
 void ICACHE_FLASH_ATTR writeToEEPROM() {
-    syslog.logf(LOG_INFO, "to eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v, brightness.getBrightness());
-    EEPROM.write(0,255);
+    syslog.logf(LOG_INFO, "to eeprom - h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v,
+                brightness.getBrightness());
+    EEPROM.write(0, 255);
     EEPROM.write(1, brightness.getBrightness());
     EEPROM.put(2, ledColorValue);
     EEPROM.put(3, player.getMode());
@@ -280,11 +288,13 @@ void loop() {
 }
 
 #ifndef DO_NOT_USE_WIFI
+
 void onHandleOTA(uint32_t deltaTime) {
     ArduinoOTA.handle();
 }
+
 void onMonitorWifi(uint32_t deltaTime) {
-    if(WiFi.status() != WL_CONNECTED) {
+    if (WiFi.status() != WL_CONNECTED) {
 
         Serial.println("Attempting to reconnect to Wifi");
         // Attempt to reconnect
@@ -297,8 +307,12 @@ void onMonitorWifi(uint32_t deltaTime) {
         }
     }
 }
+
 #endif
-void ICACHE_FLASH_ATTR showRetries(uint32_t deltaTime) { syslog.logf(LOG_DEBUG, "R: %i, F: %i\n", _retry_cnt, _frame_cnt); }
+
+void ICACHE_FLASH_ATTR showRetries(uint32_t deltaTime) {
+    syslog.logf(LOG_DEBUG, "R: %i, F: %i\n", _retry_cnt, _frame_cnt);
+}
 
 void ICACHE_FLASH_ATTR showStats(uint32_t deltaTime) {
 
@@ -311,7 +325,7 @@ void ICACHE_FLASH_ATTR showStats(uint32_t deltaTime) {
     ulong dur = deltaTime / 1000;
     ulong lps = numLoops - lastLoopCnt;
     lastLoopCnt = numLoops;
-    sprintf(lb, "L:%i NL:%i LPS:%u DUR:%u", lps, numLoops,lps/dur,dur);
+    sprintf(lb, "L:%i NL:%i LPS:%u DUR:%u", lps, numLoops, lps / dur, dur);
     syslog.log(LOG_DEBUG, lb);
     Serial.println(lb);
 }

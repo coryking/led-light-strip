@@ -6,7 +6,7 @@
 #include "config.h"
 
 uint16_t Mixer::readFrame(CRGB *buffer, ulong time) {
-    switch(state) {
+    switch (state) {
         case MIXER_TRANSITIONING:
             this->readTransitionFrame(buffer, time);
             break;
@@ -18,18 +18,18 @@ uint16_t Mixer::readFrame(CRGB *buffer, ulong time) {
     return getNumLeds();
 }
 
-void Mixer::readSteadyStateFrame(CRGB* buffer, ulong time) {
+void Mixer::readSteadyStateFrame(CRGB *buffer, ulong time) {
     this->currentPattern->readFrame(buffer, time);
 }
 
-void Mixer::readTransitionFrame(CRGB*buffer, ulong time) {
+void Mixer::readTransitionFrame(CRGB *buffer, ulong time) {
     fract8 amountRemaining = map(time, transitionStartTime, transitionEndTime, 0, 255);
     currentPattern->readFrame(buffer, time);
     oldPattern->readFrame(this->oldPatternBuffer, time);
 
-    nblend(buffer, this->oldPatternBuffer, getNumLeds(), ease8InOutApprox(255-amountRemaining));
+    nblend(buffer, this->oldPatternBuffer, getNumLeds(), ease8InOutApprox(255 - amountRemaining));
 
-    if(amountRemaining == 255 || time > transitionEndTime) {
+    if (amountRemaining == 255 || time > transitionEndTime) {
         this->transitionToSteadyState();
     }
 }
@@ -37,15 +37,15 @@ void Mixer::readTransitionFrame(CRGB*buffer, ulong time) {
 Mixer::Mixer(uint16_t numLeds) : Playable(numLeds) {
     this->currentPattern = new SolidColor(numLeds);
     this->currentPattern->beginAnimation();
-    this->oldPatternBuffer = (CRGB*)malloc(sizeof(CRGB) * numLeds);
+    this->oldPatternBuffer = (CRGB *) malloc(sizeof(CRGB) * numLeds);
 }
 
 void ICACHE_FLASH_ATTR Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime) {
     syslog.log(LOG_INFO, "setting next pattern...");
-    if(nextPattern == NULL) {
+    if (nextPattern == NULL) {
         return;
     }
-    if(nextPattern == currentPattern) {
+    if (nextPattern == currentPattern) {
         syslog.log(LOG_DEBUG, "moving to new variant...");
         currentPattern->newVariant();
         return;
@@ -71,7 +71,7 @@ Mixer::~Mixer() {
 
 void ICACHE_FLASH_ATTR Mixer::transitionToSteadyState() {
     syslog.log(LOG_INFO, "t to ss");
-    if(this->oldPattern != NULL) {
+    if (this->oldPattern != NULL) {
         this->oldPattern->endAnimation();
         this->oldPattern = NULL;
     }

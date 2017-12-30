@@ -32,6 +32,7 @@ typedef enum {
 class Player : public Task {
 public:
     Player(uint32_t numLeds) : Player(numLeds, FRAMES_PER_SECOND) {}
+
     Player(uint32_t numLeds, uint8_t framesPerSecond);
 
     CRGB *getFastLEDBuffer() const;
@@ -39,11 +40,15 @@ public:
     uint32_t getNumLeds() const;
 
     PlayerMode getMode() const;
+
     void setRandomMode();
+
     void setPattern(uint8_t patternNumber);
-    void setFixedPatternMode(AbstractPattern* pattern, uint16_t transitionTime = DEFAULT_TRANSITION_TIME);
+
+    void setFixedPatternMode(AbstractPattern *pattern, uint16_t transitionTime = DEFAULT_TRANSITION_TIME);
 
     void setPower(bool power);
+
     bool getPower() const;
 
     virtual ~Player();
@@ -52,16 +57,16 @@ protected:
     void OnUpdate(uint32_t deltaTime) override;
 
 private:
-    CRGB* buffer = NULL;
+    CRGB *buffer = NULL;
     uint32_t numLeds;
     PlayerMode mode = Mode_FixedPattern;
     PlayerMode savedMode;
-    AbstractPattern* savedPattern;
+    AbstractPattern *savedPattern;
 
-    Mixer* mixer;
-    RandomPatternList* list;
+    Mixer *mixer;
+    RandomPatternList *list;
 
-    SolidColor* offColor;
+    SolidColor *offColor;
 
     PlayerPowerState powerState = PLAYER_POWERED_OFF;
 };

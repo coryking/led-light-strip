@@ -4,37 +4,35 @@
 
 #include "Player.h"
 #include "animations/patterns.h"
-#include "devices.h"
 
 Player::Player(uint32_t numLeds, uint8_t framesPerSecond) :
         numLeds(numLeds),
-        Task(MsToTaskTime(1000/framesPerSecond))
-{
+        Task(MsToTaskTime(1000 / framesPerSecond)) {
     offColor = new SolidColor(numLeds);
-    buffer = (CRGB*)malloc(sizeof(CRGB) * numLeds);
+    buffer = (CRGB *) malloc(sizeof(CRGB) * numLeds);
     this->mixer = new Mixer(numLeds);
     this->list = new RandomPatternList({
-           new NoisyConfetti(numLeds),
+                                               new NoisyConfetti(numLeds),
 
 #ifdef USE_FIRE_PATTERNS
-                new MirrorPattern<FirePattern>(numLeds),
-                new MirrorPattern<PalettePattern>(numLeds),
-                new MirrorPattern<RainbowFirePattern>(numLeds),
+                                       new MirrorPattern<FirePattern>(numLeds),
+                                       new MirrorPattern<PalettePattern>(numLeds),
+                                       new MirrorPattern<RainbowFirePattern>(numLeds),
 #endif
-               new Rainbow(numLeds),
-               new RollingPattern(numLeds, RainbowColors_p),
-               new RollingPattern(numLeds, RainbowStripeColors_p),
-               // new Sinelon(numLeds), // baby hates this one....
-               new Confetti(numLeds),
-               new Noise(numLeds),
-               new JugglePattern(numLeds),
-               new BurbleBabble(numLeds),
-               new RollingPattern(numLeds, CloudColors_p),
-               new BpmPattern(numLeds),
-               //new NoisePlusPalette(numLeds),
+                                               new Rainbow(numLeds),
+                                               new RollingPattern(numLeds, RainbowColors_p),
+                                               new RollingPattern(numLeds, RainbowStripeColors_p),
+                                               // new Sinelon(numLeds), // baby hates this one....
+                                               new Confetti(numLeds),
+                                               new Noise(numLeds),
+                                               new JugglePattern(numLeds),
+                                               new BurbleBabble(numLeds),
+                                               new RollingPattern(numLeds, CloudColors_p),
+                                               new BpmPattern(numLeds),
+                                               //new NoisePlusPalette(numLeds),
                                                //new RollingPattern(numLeds, ForestColors_p),
 
-       });
+                                       });
 }
 
 void Player::OnUpdate(uint32_t deltaTime) {
@@ -43,9 +41,9 @@ void Player::OnUpdate(uint32_t deltaTime) {
 #ifdef DEBUG_LOOP_TIMING
     uint32_t start_cyc = __clock_cycles();
 #endif
-    if(powerState == PLAYER_POWERING_ON) {
+    if (powerState == PLAYER_POWERING_ON) {
         this->mixer->setNextPattern(savedPattern, POWER_TRANSITION_MS);
-        if(savedMode == Mode_RandomPattern) {
+        if (savedMode == Mode_RandomPattern) {
             this->setRandomMode();
         } else {
             this->setFixedPatternMode(savedPattern, POWER_TRANSITION_MS);
@@ -53,16 +51,16 @@ void Player::OnUpdate(uint32_t deltaTime) {
         syslog.log(LOG_INFO, "POWER_ON");
         powerState = PLAYER_POWER_ON;
     }
-    if(powerState == PLAYER_POWERING_OFF) {
+    if (powerState == PLAYER_POWERING_OFF) {
         savedPattern = this->mixer->getCurrentPattern();
         savedMode = this->getMode();
         this->setFixedPatternMode(offColor, POWER_TRANSITION_MS);
         syslog.log(LOG_INFO, "POWER_OFF");
         powerState = PLAYER_POWERED_OFF;
     }
-    if(powerState == PLAYER_POWER_ON || powerState == PLAYER_POWERED_OFF) {
+    if (powerState == PLAYER_POWER_ON || powerState == PLAYER_POWERED_OFF) {
         this->mixer->readFrame(this->getFastLEDBuffer(), time);
-        if(this->getMode() == Mode_RandomPattern) {
+        if (this->getMode() == Mode_RandomPattern) {
             if (this->mixer->canStop()) {
                 syslog.log(LOG_INFO, "next pattern...");
                 this->mixer->setNextPattern(
@@ -102,7 +100,7 @@ uint32_t Player::getNumLeds() const {
 }
 
 void Player::setPower(bool power) {
-    if(power && powerState == PLAYER_POWERED_OFF) {
+    if (power && powerState == PLAYER_POWERED_OFF) {
         syslog.log("Powering On");
         powerState = PLAYER_POWERING_ON;
     }
@@ -118,7 +116,7 @@ bool Player::getPower() const {
 }
 
 void Player::setRandomMode() {
-    if(this->getMode() != Mode_RandomPattern) {
+    if (this->getMode() != Mode_RandomPattern) {
         this->mode = Mode_RandomPattern;
         this->mixer->setNextPattern(
                 this->list->getRandomPattern()
@@ -126,7 +124,7 @@ void Player::setRandomMode() {
     }
 }
 
-void Player::setFixedPatternMode(AbstractPattern* pattern,  uint16_t transitionTime) {
+void Player::setFixedPatternMode(AbstractPattern *pattern, uint16_t transitionTime) {
     this->mode = Mode_FixedPattern;
     this->mixer->setNextPattern(pattern, transitionTime);
 }

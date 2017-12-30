@@ -17,7 +17,7 @@ public:
 
     }
 
-    void  setBrightness(uint8_t brightness, boolean noDelay=false) {
+    void setBrightness(uint8_t brightness, boolean noDelay = false) {
         uint64_t t = millis();
         syslog.logf(LOG_INFO, "b to %d (%d)", brightness, FastLED.getBrightness());
         Serial.printf("b to %d (%d)\n", brightness, FastLED.getBrightness());
@@ -28,7 +28,7 @@ public:
 
         // If no delay, lets be literal and not even wait for
         // the next time the task manager calls us....
-        if(noDelay) {
+        if (noDelay) {
             setFastLEDBrightness(brightness);
         }
 
@@ -50,8 +50,8 @@ public:
 protected:
     void OnUpdate(uint32_t deltaTime) override {
         Task::OnUpdate(deltaTime);
-        uint32_t time=millis();
-        if(transitioner.isActive(time)) {
+        uint32_t time = millis();
+        if (transitioner.isActive(time)) {
             auto bright = transitioner.getCurrentValue(time);
             setFastLEDBrightness(bright);
         } else {
