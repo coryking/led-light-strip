@@ -24,6 +24,7 @@
 #ifndef DO_NOT_USE_WIFI
 
 #include "MqttPubSub.h"
+#include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
 
 #endif
@@ -137,7 +138,7 @@ void didConnectMQTT() {
     mqttPubSub.publishBrightness(brightness.getBrightness());
     mqttPubSub.publishPower(player.getPower());
     mqttPubSub.publishHSV(ledColorValue);
-    mqttPubSub.publishRandom(player.getMode() == PlayerMode::Mode_RandomPattern ? true : false);
+    mqttPubSub.publishRandom(player.getMode() == PlayerMode::Mode_RandomPattern);
 }
 
 #endif

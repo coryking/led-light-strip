@@ -42,7 +42,7 @@ Mixer::Mixer(uint16_t numLeds) : Playable(numLeds) {
 
 void ICACHE_FLASH_ATTR Mixer::setNextPattern(AbstractPattern *nextPattern, uint16_t transitionTime) {
     syslog.log(LOG_INFO, "setting next pattern...");
-    if (nextPattern == NULL) {
+    if (nextPattern == nullptr) {
         return;
     }
     if (nextPattern == currentPattern) {
@@ -71,9 +71,9 @@ Mixer::~Mixer() {
 
 void ICACHE_FLASH_ATTR Mixer::transitionToSteadyState() {
     syslog.log(LOG_INFO, "t to ss");
-    if (this->oldPattern != NULL) {
+    if (this->oldPattern != nullptr) {
         this->oldPattern->endAnimation();
-        this->oldPattern = NULL;
+        this->oldPattern = nullptr;
     }
     this->state = MIXER_STEADY_STATE;
 }

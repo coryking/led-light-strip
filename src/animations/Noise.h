@@ -20,13 +20,13 @@ protected:
     virtual void newTargetPalette();
 
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
 
-    Noise(uint16 numLeds);
+    explicit Noise(uint16 numLeds);
 
-    virtual void resetRuntime();
+    void resetRuntime() override;
 
-    virtual uint16_t getMinRuntime() {
+    uint16_t getMinRuntime() override {
         return minRuntime;
     }
 

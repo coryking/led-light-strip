@@ -11,7 +11,7 @@
 
 class JugglePattern : public AbstractPattern {
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time) {
+    uint16_t readFrame(CRGB *buffer, ulong time) override {
         fadeToBlackBy( buffer, getNumLeds(), 20);
         byte dothue = 0;
         for( int i = 0; i < 8; i++) {
@@ -20,7 +20,7 @@ public:
         }
     }
 
-    JugglePattern(uint16 numLeds) : AbstractPattern(numLeds) {
+    explicit JugglePattern(uint16 numLeds) : AbstractPattern(numLeds) {
 
     }
 };

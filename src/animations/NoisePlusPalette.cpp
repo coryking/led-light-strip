@@ -18,7 +18,7 @@ NoisePlusPalette::~NoisePlusPalette() {
 }
 
 void NoisePlusPalette::fillnoise8() {
-    if(noise==NULL)
+    if(noise== nullptr)
         return;
 // If we're runing at a low "speed", some 8-bit artifacts become visible
     // from frame-to-frame.  In order to reduce this, we can do some fast data-smoothing.
@@ -59,7 +59,7 @@ void NoisePlusPalette::fillnoise8() {
 }
 
 uint16_t NoisePlusPalette::readFrame(CRGB *buffer, ulong time) {
-    if(noise==NULL)
+    if(noise== nullptr)
         return 0;
 
     ChangePaletteAndSettingsPeriodically();
@@ -98,10 +98,10 @@ uint16_t NoisePlusPalette::readFrame(CRGB *buffer, ulong time) {
 
 uint16_t NoisePlusPalette::XY(uint8_t x, uint8_t y) {
     uint16_t i;
-    if( kMatrixSerpentineLayout == false) {
+    if(kMatrixSerpentineLayout == 0) {
         i = (y * kMatrixWidth) + x;
     }
-    if( kMatrixSerpentineLayout == true) {
+    if(kMatrixSerpentineLayout != 0) {
         if( y & 0x01) {
             // Odd rows run backwards
             uint8_t reverseX = (kMatrixWidth - 1) - x;
@@ -137,14 +137,14 @@ void NoisePlusPalette::ChangePaletteAndSettingsPeriodically() {
 
 void NoisePlusPalette::beginAnimation() {
     AbstractPattern::beginAnimation();
-    if(noise==NULL)
+    if(noise== nullptr)
         noise = (uint8_t *)malloc(sizeof(uint8_t) * kMatrixWidth * 2);
 }
 
 void NoisePlusPalette::endAnimation() {
     AbstractPattern::endAnimation();
-    if(noise!=NULL)
+    if(noise!= nullptr)
         free(noise);
 
-    noise=NULL;
+    noise= nullptr;
 }

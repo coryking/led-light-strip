@@ -13,7 +13,7 @@ void RemoteControl::OnUpdate(uint32_t deltaTime) {
         serialPrintUint64(results.value, 16);
         Serial.println();
         if(remoteButtonMap.find(results.value) != remoteButtonMap.end() &&
-           remoteButtonPressedEvent != NULL) {
+           remoteButtonPressedEvent != nullptr) {
             RemoteButtons btn = remoteButtonMap[results.value];
             remoteButtonPressedEvent(btn);
         }

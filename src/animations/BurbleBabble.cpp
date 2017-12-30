@@ -14,30 +14,30 @@ BurbleBabble::BurbleBabble(uint16 numLeds) : Noise(numLeds) {
 
 void BurbleBabble::beginAnimation() {
     Noise::beginAnimation();
-    if(confetti==NULL)
+    if(confetti== nullptr)
         confetti = (CRGB*)malloc(sizeof(CRGB) * getNumLeds());
 
-    if(confettiOpacity==NULL)
+    if(confettiOpacity== nullptr)
         confettiOpacity = (uint8_t*)malloc(sizeof(uint8_t) * getNumLeds());
 }
 
 void BurbleBabble::endAnimation() {
     Noise::endAnimation();
-    if(confetti!=NULL) {
+    if(confetti!= nullptr) {
         free(confetti);
-        confetti = NULL;
+        confetti = nullptr;
     }
 
-    if(confettiOpacity!=NULL) {
+    if(confettiOpacity!= nullptr) {
         free(confettiOpacity);
-        confettiOpacity = NULL;
+        confettiOpacity = nullptr;
     }
 }
 
 uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
     Noise::readFrame(buffer, time);
 
-    if(confetti==NULL || confettiOpacity==NULL)
+    if(confetti== nullptr || confettiOpacity== nullptr)
         return 0;
 
 

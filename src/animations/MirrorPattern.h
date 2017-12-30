@@ -18,9 +18,10 @@ private:
 public:
 
 
-    virtual uint16_t readFrame(CRGB *buffer, ulong time) {
+    uint16_t readFrame(CRGB *buffer, ulong time) override {
         if(segmentBuffer == nullptr || pattern == nullptr)
             return 0;
+
 
         this->pattern->readFrame(segmentBuffer, time);
 
@@ -69,7 +70,7 @@ public:
         this->pattern->newVariant();
     }
 
-    MirrorPattern(uint16 numLeds) :
+    explicit MirrorPattern(uint16 numLeds) :
             AbstractPattern(numLeds),
             segmentNumLeds(numLeds/SEGMENTS) {
         pattern = new PATTERN_TYPE(segmentNumLeds);

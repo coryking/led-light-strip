@@ -10,9 +10,9 @@
 
 class Sinelon : public HuePattern {
 public:
-    uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
 
-    Sinelon(uint16 numLeds);
+    explicit Sinelon(uint16 numLeds);
 };
 
 

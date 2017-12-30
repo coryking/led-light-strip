@@ -5,7 +5,7 @@
 #include "FirePattern.h"
 
 uint16_t FirePattern::readFrame(CRGB *buffer, ulong time) {
-    if(heat==NULL)
+    if(heat== nullptr)
         return 0;
     this->onReadFrame();
 
@@ -54,16 +54,16 @@ FirePattern::~FirePattern() {
 
 void FirePattern::beginAnimation() {
     AbstractPattern::beginAnimation();
-    if(heat == NULL)
+    if(heat == nullptr)
         heat = (byte *) malloc(getNumLeds() * sizeof(byte));
 }
 
 void FirePattern::endAnimation() {
     AbstractPattern::endAnimation();
-    if(heat != NULL)
+    if(heat != nullptr)
         free(heat);
 
-    heat = NULL;
+    heat = nullptr;
 
 }
 

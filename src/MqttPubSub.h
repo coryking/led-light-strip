@@ -38,10 +38,6 @@ public:
     typedef std::function<void(int)> IntValueCallback;
     typedef std::function<void(bool)> PowerCallback;
 
-    typedef std::function<bool(void)> GetPowerCallback;
-    typedef std::function<CHSV(void)> GetHSVCallback;
-    typedef std::function<uint8_t(void)> GetBrightnessCallback;
-
     MqttPubSub(const char* mqttHost, const uint16_t mqttPort) : MqttController(mqttHost,mqttPort, &syslog) {
         char espTheTopicId[20] = {0};
         sprintf(espTheTopicId, "ESP_%06X", ESP.getChipId());
@@ -108,7 +104,7 @@ private:
 
 
 
-    void setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, byte *payload, unsigned int length, int ol, int oh);
+    void setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, const byte *payload, unsigned int length, int ol, int oh);
     void intRangeToChar(uint16_t in, uint16_t il, uint16_t ih, uint16_t ol, uint16_t oh, char* outBuff);
 
 };

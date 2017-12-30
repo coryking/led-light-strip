@@ -20,9 +20,9 @@ typedef struct {
 
 class NoisyConfetti : public HuePattern {
 public:
-    uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
 
-    NoisyConfetti(uint16 numLeds);
+    explicit NoisyConfetti(uint16 numLeds);
 
     void ICACHE_FLASH_ATTR newVariant() override;
 

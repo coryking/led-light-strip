@@ -12,7 +12,7 @@
 
 class NoisePlusPalette : public AbstractPattern {
 public:
-    NoisePlusPalette(uint16 numLeds);
+    explicit NoisePlusPalette(uint16 numLeds);
     virtual ~NoisePlusPalette();
 
     uint16_t readFrame(CRGB *buffer, ulong time) override;
@@ -45,7 +45,7 @@ protected:
     uint16_t scale = 30; // scale is set dynamically once we've started up
 
     // This is the array that we keep our computed noise values in
-    uint8_t *noise = NULL;
+    uint8_t *noise = nullptr;
 
     CRGBPalette16 currentPalette;
     uint8_t       colorLoop = 1;

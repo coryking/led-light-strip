@@ -21,7 +21,7 @@ public:
     }
 
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time) {
+    uint16_t readFrame(CRGB *buffer, ulong time) override {
 
         HuePattern::readFrame(buffer,time);
         uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
@@ -31,7 +31,7 @@ public:
         }
     }
 
-    BpmPattern(uint16 numLeds) : HuePattern(numLeds) {}
+    explicit BpmPattern(uint16 numLeds) : HuePattern(numLeds) {}
 };
 
 #endif //NEOPIXELLEDCONTROLLER_BPMPATTERN_H
