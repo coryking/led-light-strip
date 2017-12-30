@@ -5,47 +5,80 @@
 #ifndef RGBWPLAY_MIRRORPATTERN_H
 #define RGBWPLAY_MIRRORPATTERN_H
 
-#include <vector>
+#include <FastLED.h>
 #include "AbstractPattern.h"
-#include "FirePattern.h"
+#include "mem_functions.h"
 
 
-typedef struct {
-    AbstractPattern* pattern;
-    uint16 offset;
-    uint16 length;
-
-} LightString;
-
-template <class T> class MirrorPattern : public AbstractPattern {
+template <class PATTERN_TYPE, int SEGMENTS=2> class MirrorPattern : public AbstractPattern {
 private:
-    //std::vector<LightString> _lightStrings;
-    ReversablePattern* leftPattern;
-    ReversablePattern* rightPattern;
-    uint16_t middleLedPosition;
-
+    AbstractPattern* pattern;
+    CRGB* segmentBuffer;
+    const int segmentNumLeds;
 public:
+
+
     virtual uint16_t readFrame(CRGB *buffer, ulong time) {
-        /* for (auto & element : _lightStrings) {
-            CRGB* bufferPos = buffer + element.offset;
-            element.pattern->readFrame(bufferPos, time);
+        if(segmentBuffer == nullptr || pattern == nullptr)
+            return 0;
+
+        this->pattern->readFrame(segmentBuffer, time);
+
+        bool invert = false;
+        for(int segment=0; segment < SEGMENTS; segment++)
+        {
+            reverse_memcpy<CRGB>(&buffer[segmentNumLeds * segment], segmentBuffer, segmentNumLeds, invert);
+            invert = !invert;
         }
-
-        return getNumLeds(); */
-        CRGB* bufferPos = buffer;
-        leftPattern->readFrame(bufferPos, time);
-
-        bufferPos = buffer + middleLedPosition;
-        rightPattern->readFrame(bufferPos, time);
 
         return getNumLeds();
 
     }
 
-    MirrorPattern(uint16 numLeds) : AbstractPattern(numLeds) {
-        middleLedPosition = numLeds / 2;
-        leftPattern = new T(middleLedPosition, false);
-        rightPattern = new T(middleLedPosition, true);
+    void resetRuntime() override {
+        this->pattern->resetRuntime();
+    }
+
+    ulong getRuntime() override {
+        return this->pattern->getRuntime();
+    }
+
+    uint16_t getMinRuntime() override {
+        return this->pattern->getMinRuntime();
+    }
+
+    void beginAnimation() override {
+        AbstractPattern::beginAnimation();
+        if(segmentBuffer == nullptr) {
+            segmentBuffer = (CRGB*)malloc(sizeof(CRGB) * segmentNumLeds );
+        }
+        this->pattern->beginAnimation();
+    }
+
+    void endAnimation() override {
+        AbstractPattern::endAnimation();
+        if(segmentBuffer != nullptr) {
+            free(segmentBuffer);
+            segmentBuffer = nullptr;
+        }
+        this->pattern->endAnimation();
+    }
+
+    void newVariant() override {
+        AbstractPattern::newVariant();
+        this->pattern->newVariant();
+    }
+
+    MirrorPattern(uint16 numLeds) :
+            AbstractPattern(numLeds),
+            segmentNumLeds(numLeds/SEGMENTS) {
+        pattern = new PATTERN_TYPE(segmentNumLeds);
+
+
+    }
+
+    virtual ~MirrorPattern() {
+        endAnimation();
     }
 };
 

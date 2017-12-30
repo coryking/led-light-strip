@@ -46,12 +46,12 @@ public:
 
     virtual void resetRuntime();
 
-    ulong getRuntime();
+    virtual ulong getRuntime();
     /**
      * Determines if this object can be stopped (i.e. has this made it past minRunTime?)
      * @return returns true if you can stop this
      */
-    bool canStop();
+    bool virtual canStop();
 
     /**
          * Get the minimum milliseconds this can run for
