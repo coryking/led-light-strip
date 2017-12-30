@@ -24,6 +24,7 @@
 #ifndef DO_NOT_USE_WIFI
 
 #include "MqttPubSub.h"
+#include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
 
 #endif
