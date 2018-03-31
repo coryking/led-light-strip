@@ -25,19 +25,11 @@ void MqttPubSub::mqttCallback(char *topic, byte *payload, unsigned int length) {
     if (theTopic == mqttSetBrightnessTopic) {
         setPayloadToIntCb(lightBrightnessCallback, payload, length, 0, 100);
     }
-    if (theTopic == mqttSetRandomTopic && lightRandomCallback != NULL) {
-        if ( length > 0 && payload[0] == 't') {
-            lightRandomCallback(true);
-        } else {
-            lightRandomCallback(false);
-        }
+    if (theTopic == mqttSetRandomTopic && lightRandomCallback != nullptr) {
+        lightRandomCallback(length > 0 && payload[0] == 't');
     }
-    if (theTopic == mqttSetPowerTopic && lightPowerCallback != NULL) {
-        if ( length > 0 && payload[0] == 't') {
-            lightPowerCallback(true);
-        } else {
-            lightPowerCallback(false);
-        }
+    if (theTopic == mqttSetPowerTopic && lightPowerCallback != nullptr) {
+        lightPowerCallback(length > 0 && payload[0] == 't');
     }
 }
 
@@ -105,7 +97,7 @@ MqttPubSub *MqttPubSub::setLightRandomCallback(const MqttPubSub::PowerCallback l
     return this;
 }
 
-void MqttPubSub::setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, byte *payload, unsigned int length, int ol, int oh) {
+void MqttPubSub::setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, const byte *payload, unsigned int length, int ol, int oh) {
     char message_buff[100] = {0};
     int i = 0;
     // create character buffer with ending null terminator (string)
@@ -113,7 +105,7 @@ void MqttPubSub::setPayloadToIntCb(const MqttPubSub::IntValueCallback cb, byte *
         message_buff[i] = payload[i];
     }
     message_buff[i] = '\0';
-    if(cb != NULL) {
+    if(cb != nullptr) {
         uint32_t intMsg = map(atoi(message_buff), ol, oh, 0, 255);
         syslog.logf(LOG_DEBUG, "pv: '%i'", intMsg);
 

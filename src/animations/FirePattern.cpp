@@ -5,6 +5,8 @@
 #include "FirePattern.h"
 
 uint16_t FirePattern::readFrame(CRGB *buffer, ulong time) {
+    if(heat== nullptr)
+        return 0;
     this->onReadFrame();
 
     // Step 1.  Cool down every cell a little
@@ -44,11 +46,25 @@ CRGB FirePattern::getColorFromHeat(byte the_heat) const {
 
 
 FirePattern::FirePattern(uint16 numLeds, bool reverseDirection) : ReversablePattern(numLeds, reverseDirection) {
-    heat = (byte *) malloc(getNumLeds() * sizeof(byte));
 
 }
 FirePattern::~FirePattern() {
-    free(heat);
+    endAnimation();
+}
+
+void FirePattern::beginAnimation() {
+    AbstractPattern::beginAnimation();
+    if(heat == nullptr)
+        heat = (byte *) malloc(getNumLeds() * sizeof(byte));
+}
+
+void FirePattern::endAnimation() {
+    AbstractPattern::endAnimation();
+    if(heat != nullptr)
+        free(heat);
+
+    heat = nullptr;
+
 }
 
 RainbowFirePattern::RainbowFirePattern(uint16 numLeds, bool reverseDirection) : FirePattern(numLeds,

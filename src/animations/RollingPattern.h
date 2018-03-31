@@ -17,7 +17,7 @@ protected:
     uint8_t BeatsPerMinute = 62;
 
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time) {
+    uint16_t readFrame(CRGB *buffer, ulong time) override {
 
         HuePattern::readFrame(buffer,time);
 
@@ -25,11 +25,11 @@ public:
         for( int i = 0; i < getNumLeds(); i++) { //9948
             uint8_t brightness = 255; // abs(127 - (beat - gHue + (i * INVERSE_WIDTH)) % 255);
 
-            buffer[i] = ColorFromPalette(palette, gHue+(i), brightness);
+            buffer[i] = ColorFromPalette(palette, getHue()+(i), brightness);
         }
     }
 
-    virtual ICACHE_FLASH_ATTR void resetRuntime() {
+    ICACHE_FLASH_ATTR void resetRuntime() override {
         HuePattern::resetRuntime();
         BeatsPerMinute = random(50, 80);
     }

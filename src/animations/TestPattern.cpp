@@ -41,6 +41,8 @@ uint16_t TestPattern::readFrame(CRGB *buffer, ulong time) {
         case 5:
             fill_solid(buffer,getNumLeds(), CRGB::Gray);
             break;
+        default:
+            break;
     }
 
 }

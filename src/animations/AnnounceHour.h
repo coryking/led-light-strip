@@ -8,16 +8,16 @@
 #include "AbstractPattern.h"
 
 // Run for exactly 60 seconds
-#define ANNOUNCE_RUNTIME 30 * 1000
+#define ANNOUNCE_RUNTIME (30 * 1000)
 
 class AnnounceHour: public AbstractPattern {
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
 
-    AnnounceHour(uint16 numLeds);
+    explicit AnnounceHour(uint16 numLeds);
 
 private:
-    virtual uint16_t getMinRuntime() {
+    uint16_t getMinRuntime() override {
         return ANNOUNCE_RUNTIME;
     }
 

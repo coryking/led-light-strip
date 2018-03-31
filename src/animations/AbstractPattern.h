@@ -9,7 +9,7 @@
 #include <FastLED.h>
 #include "Playable.h"
 
-#define DEFAULT_DURATION 3 * 60 * 1000
+#define DEFAULT_DURATION (3 * 60 * 1000)
 
 #define FIRST_LED_OFFSET 1
 #define FIRST_LED_LENGTH 56
@@ -40,18 +40,18 @@ public:
      */
     //virtual uint16_t readFrame(CRGB * buffer, ulong time) = 0;
 
-    AbstractPattern(uint16 numLeds) : Playable(numLeds) {
+    explicit AbstractPattern(uint16 numLeds) : Playable(numLeds) {
         _startTime = millis();
     }
 
     virtual void resetRuntime();
 
-    ulong getRuntime();
+    virtual ulong getRuntime();
     /**
      * Determines if this object can be stopped (i.e. has this made it past minRunTime?)
      * @return returns true if you can stop this
      */
-    bool canStop();
+    bool virtual canStop();
 
     /**
          * Get the minimum milliseconds this can run for
@@ -62,37 +62,55 @@ public:
     }
 
     /***
+     * start the animation sequence.  Load any memory, etc...
+     */
+    virtual void beginAnimation() {}
+
+    /***
+     * end the animation sequence.  free any memory, etc...
+     */
+    virtual void endAnimation() {}
+
+
+    /***
      * Switch to a new variation of this pattern.....
      */
     virtual void newVariant() {}
 };
 
 class HuePattern : public AbstractPattern {
-protected:
+private:
+    uint8_t gHue = 0;
     const uint16_t minHueDelay = 15;
     const uint16_t maxHueDelay = 100;
-    uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+
+    // rotating "base color" used by many of the patterns
     uint8_t gHueDelay = 20;
     void newHueDelay() { gHueDelay = random(minHueDelay, maxHueDelay); }
+protected:
+
+    virtual uint8_t getHue() const {
+        return gHue;
+    }
 
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time) {
+    uint16_t readFrame(CRGB *buffer, ulong time) override {
         EVERY_N_MILLISECONDS(gHueDelay) {
             gHue++;
         }
     }
 
-    virtual void resetRuntime() {
+    void resetRuntime() override {
         newHueDelay();
 
         AbstractPattern::resetRuntime();
     }
 
-    virtual void newVariant() override {
+    void newVariant() override {
 
     }
 
-    HuePattern(uint16 numLeds) : AbstractPattern(numLeds) {
+    explicit HuePattern(uint16 numLeds) : AbstractPattern(numLeds) {
         gHue = random(0,255);
         newHueDelay();
     }

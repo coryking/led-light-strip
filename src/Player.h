@@ -33,23 +33,24 @@ typedef enum {
 
 class Player : public Task {
 public:
-    Player(uint32_t numLeds) : Player(numLeds, FRAMES_PER_SECOND, NULL) {}
-    Player(uint32_t numLeds, FancyLightMixer* fancyLightMixer) : Player(numLeds, FRAMES_PER_SECOND, fancyLightMixer) {}
-    Player(uint32_t numLeds, uint8_t framesPerSecond, FancyLightMixer* FancyLightMixer);
+    explicit Player(uint32_t numLeds) : Player(numLeds, FRAMES_PER_SECOND, nullptr) {}
+
+    Player(uint32_t numLeds, uint8_t framesPerSecond, FancyLightMixer* fancyLightMixer);
 
     CRGB *getFastLEDBuffer() const;
 
     uint32_t getNumLeds() const;
 
     PlayerMode getMode() const;
+
     void setRandomMode();
     void setFancyLightMode();
     void setFancyLightMode(FancyLightPreset preset);
     void setPattern(uint8_t patternNumber);
-    void setFixedPatternMode(AbstractPattern* pattern, uint16_t transitionTime = DEFAULT_TRANSITION_TIME);
-    void setPower(bool power);
 
+    void setFixedPatternMode(AbstractPattern *pattern, uint16_t transitionTime = DEFAULT_TRANSITION_TIME);
     void setFancyLight(FancyLightMixer *fancyLight);
+    void setPower(bool power);
 
     bool getPower() const;
 
@@ -60,16 +61,16 @@ protected:
 
 private:
     FancyLightMixer* fancyLight;
-    CRGB* buffer = NULL;
+    CRGB *buffer = nullptr;
     uint32_t numLeds;
     PlayerMode mode = Mode_FixedPattern;
     PlayerMode savedMode;
-    AbstractPattern* savedPattern;
+    AbstractPattern *savedPattern;
 
-    Mixer* mixer;
-    RandomPatternList* list;
+    Mixer *mixer;
+    RandomPatternList *list;
 
-    SolidColor* offColor;
+    SolidColor *offColor;
 
     PlayerPowerState powerState = PLAYER_POWERED_OFF;
 };

@@ -12,7 +12,7 @@
 
 class Transitioner {
 public:
-    Transitioner() {}
+    Transitioner() = default;
 
     void resetTransitioner(uint32_t currentTime, uint32_t durationMs, uint8_t fromValue, uint8_t toValue) {
         this->startTime = currentTime;

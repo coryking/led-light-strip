@@ -21,17 +21,17 @@ public:
     }
 
 public:
-    virtual uint16_t readFrame(CRGB *buffer, ulong time) {
+    uint16_t readFrame(CRGB *buffer, ulong time) override {
 
         HuePattern::readFrame(buffer,time);
         uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
 
         for( int i = 0; i < getNumLeds(); i++) { //9948
-            buffer[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*INVERSE_WIDTH));
+            buffer[i] = ColorFromPalette(palette, getHue()+(i*2), beat-getHue()+(i*INVERSE_WIDTH));
         }
     }
 
-    BpmPattern(uint16 numLeds) : HuePattern(numLeds) {}
+    explicit BpmPattern(uint16 numLeds) : HuePattern(numLeds) {}
 };
 
 #endif //NEOPIXELLEDCONTROLLER_BPMPATTERN_H

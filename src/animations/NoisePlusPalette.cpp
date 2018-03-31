@@ -6,7 +6,6 @@
 
 NoisePlusPalette::NoisePlusPalette(uint16 numLeds) : AbstractPattern(numLeds) {
     kMatrixWidth=numLeds;
-    noise = (uint8_t *)malloc(sizeof(uint8_t) * kMatrixWidth * 2);
 
     // Initialize our coordinates to some random values
     x = random16();
@@ -15,10 +14,12 @@ NoisePlusPalette::NoisePlusPalette(uint16 numLeds) : AbstractPattern(numLeds) {
 }
 
 NoisePlusPalette::~NoisePlusPalette() {
-    free(noise);
+    endAnimation();
 }
 
 void NoisePlusPalette::fillnoise8() {
+    if(noise== nullptr)
+        return;
 // If we're runing at a low "speed", some 8-bit artifacts become visible
     // from frame-to-frame.  In order to reduce this, we can do some fast data-smoothing.
     // The amount of data smoothing we're doing depends on "speed".
@@ -58,6 +59,9 @@ void NoisePlusPalette::fillnoise8() {
 }
 
 uint16_t NoisePlusPalette::readFrame(CRGB *buffer, ulong time) {
+    if(noise== nullptr)
+        return 0;
+
     ChangePaletteAndSettingsPeriodically();
     fillnoise8();
     static uint8_t ihue=0;
@@ -94,10 +98,10 @@ uint16_t NoisePlusPalette::readFrame(CRGB *buffer, ulong time) {
 
 uint16_t NoisePlusPalette::XY(uint8_t x, uint8_t y) {
     uint16_t i;
-    if( kMatrixSerpentineLayout == false) {
+    if(kMatrixSerpentineLayout == 0) {
         i = (y * kMatrixWidth) + x;
     }
-    if( kMatrixSerpentineLayout == true) {
+    if(kMatrixSerpentineLayout != 0) {
         if( y & 0x01) {
             // Odd rows run backwards
             uint8_t reverseX = (kMatrixWidth - 1) - x;
@@ -129,4 +133,18 @@ void NoisePlusPalette::ChangePaletteAndSettingsPeriodically() {
         if( secondHand == 50)  { SetupRandomPalette();                     speed = 90; scale = 90; colorLoop = 1; }
         if( secondHand == 55)  { currentPalette = RainbowStripeColors_p;   speed = 30; scale = 20; colorLoop = 1; }
     }
+}
+
+void NoisePlusPalette::beginAnimation() {
+    AbstractPattern::beginAnimation();
+    if(noise== nullptr)
+        noise = (uint8_t *)malloc(sizeof(uint8_t) * kMatrixWidth * 2);
+}
+
+void NoisePlusPalette::endAnimation() {
+    AbstractPattern::endAnimation();
+    if(noise!= nullptr)
+        free(noise);
+
+    noise= nullptr;
 }

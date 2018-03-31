@@ -19,7 +19,7 @@
 
 class FirePattern : public ReversablePattern {
 private:
-    byte* heat;
+    byte* heat = nullptr;
 protected:
     virtual CRGB getColorFromHeat(byte the_heat) const;
     virtual void onReadFrame() {}
@@ -28,8 +28,11 @@ public:
 
     virtual ~FirePattern();
 
-    virtual uint16_t readFrame(CRGB *buffer, ulong time);
+    uint16_t readFrame(CRGB *buffer, ulong time) override;
 
+    void beginAnimation() override;
+
+    void endAnimation() override;
 };
 
 class RainbowFirePattern : public  FirePattern {
@@ -41,9 +44,9 @@ public:
     RainbowFirePattern(uint16 numLeds, bool reverseDirection);
 
 protected:
-    virtual CRGB getColorFromHeat(byte the_heat) const;
+    CRGB getColorFromHeat(byte the_heat) const override;
 
-    virtual void onReadFrame();
+    void onReadFrame() override;
 };
 
 
