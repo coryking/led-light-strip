@@ -8,6 +8,7 @@
 #include <FastLED.h>
 #include "AbstractPattern.h"
 #define HSV_BRIGHTNESS 255
+#define DEFAULT_VARIANCE 6
 
 class FancyLight : public AbstractPattern {
 private:
@@ -19,6 +20,8 @@ private:
     uint16_t  minRuntime = DEFAULT_DURATION;
     uint8_t hue;
     uint8_t saturation;
+    uint8_t variance = DEFAULT_VARIANCE;
+
 public:
     uint8_t getHue() const;
 
@@ -27,6 +30,10 @@ public:
     uint8_t getSaturation() const;
 
     void setSaturation(uint8_t saturation);
+
+    uint8_t getVariance() const;
+
+    void setVariance(uint8_t variance);
 
     uint16_t readFrame(CRGB *buffer, ulong time) override;
 

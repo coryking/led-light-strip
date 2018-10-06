@@ -30,8 +30,8 @@ void ICACHE_FLASH_ATTR FancyLight::changePalette() {
         }
 
     targetPalette = CRGBPalette16(
-                CHSV(random(hue - 6, hue + 6), saturation, HSV_BRIGHTNESS),// random8(128,255)),
-                CHSV(random(hue - 6, hue + 6), saturation, HSV_BRIGHTNESS), //random8(128,255)),
+                CHSV(random(hue - getVariance(), hue + getVariance()), saturation, HSV_BRIGHTNESS),// random8(128,255)),
+                CHSV(random(hue - getVariance(), hue + getVariance()), saturation, HSV_BRIGHTNESS), //random8(128,255)),
                 CHSV(hue, ms, HSV_BRIGHTNESS), //random8(128,255)),
                 CHSV(hue, saturation, HSV_BRIGHTNESS)); //random8(128,255)));
 }
@@ -60,4 +60,12 @@ uint8_t ICACHE_FLASH_ATTR FancyLight::getSaturation() const {
 }
 void ICACHE_FLASH_ATTR FancyLight::setSaturation(uint8_t saturation) {
     FancyLight::saturation = saturation;
+}
+
+uint8_t FancyLight::getVariance() const {
+    return variance;
+}
+
+void FancyLight::setVariance(uint8_t variance) {
+    FancyLight::variance = variance;
 }

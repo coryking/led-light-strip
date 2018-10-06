@@ -17,11 +17,11 @@ uint16_t FancyLightMixer::readFrame(CRGB *buffer, ulong time) {
 }
 
 void FancyLightMixer::changePreset(FancyLightPreset newPreset) {
-    CHSV item = this->lightPresets.at(newPreset);
+    FancyLightColor item = this->lightPresets.at(newPreset);
 
-    this->fancyLight->setSaturation(item.saturation);
-    this->fancyLight->setHue(item.hue);
-    this->brightnessControl->setBrightness(item.value);
+    this->fancyLight->setSaturation(item.color.saturation);
+    this->fancyLight->setHue(item.color.hue);
+    this->brightnessControl->setBrightness(item.color.value);
     this->fancyLight->changePalette();
 }
 
