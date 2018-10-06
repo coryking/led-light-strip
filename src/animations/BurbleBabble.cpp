@@ -108,6 +108,11 @@ void BurbleBabble::newVariant() {
     if(currentHues==confettiHues.size())
         currentHues=0;
     nextConfettiPieceTime=0;
+    /*for (int i = 0; i < getNumLeds(); i++) {
+        stickFactor[i] = 0;
+        confettiOpacity[i] = 0;
+        confetti[i] = CHSV(255,0,0);
+    }*/
     newTargetPalette();
 }
 

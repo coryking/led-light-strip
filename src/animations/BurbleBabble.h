@@ -63,7 +63,7 @@ private:
     std::vector<ConfettiHue> confettiHues = {
             {HUE_PURPLE - 10, HUE_PURPLE + 10, 2, 10, true, 10, 200,200},
             {HUE_ORANGE - 5, HUE_ORANGE + 5, 2, 10, true, 10, 200, 200},
-            {HUE_YELLOW, HUE_GREEN, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0,50},
+            //{HUE_YELLOW, HUE_GREEN, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0,50},
            /* {HUE_PURPLE, HUE_PINK, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0,10},
             {HUE_BLUE, HUE_PURPLE, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0,10},
             {HUE_RED, HUE_ORANGE, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0, 10},
