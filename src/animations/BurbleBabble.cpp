@@ -40,17 +40,20 @@ uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
     if(confetti== nullptr || confettiOpacity== nullptr)
         return 0;
 
-
-    // random colored speckles that blink in and fade smoothly
-    for(int i = 0; i < getNumLeds(); i++) {
-        nblend(buffer[i], confetti[i],confettiOpacity[i]);
-        confettiOpacity[i] = qsub8(confettiOpacity[i], getPieceDecayAmount());
+    if(nextDecayTime <= time) {
+        // random colored speckles that blink in and fade smoothly
+        for (int i = 0; i < getNumLeds(); i++) {
+            nblend(buffer[i], confetti[i], confettiOpacity[i]);
+            confettiOpacity[i] = qsub8(confettiOpacity[i], getPieceDecayAmount());
+        }
+        nextDecayTime = time + getPieceDecayTime();
     }
+
     if(nextConfettiPieceTime <= time) {
         int pos = random16(getNumLeds());
 
         if(getUseBlackGlitter()){
-            confetti[pos] = CHSV(255,255,0);
+            confetti[pos] = CHSV(255,0,0);
         } else {
             confetti[pos] = CHSV(getHue(true), random8(200, 255), 255);
         }
@@ -58,9 +61,9 @@ uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
 
         nextConfettiPieceTime =
                 time +
-                random8(
-                        pieceMinTime,
-                        pieceMaxTime);
+                random16(
+                        getPieceMinTime(),
+                        getPieceMaxTime());
     }
     return getNumLeds();
 
@@ -96,9 +99,25 @@ void BurbleBabble::newVariant() {
 }
 
 const uint8_t BurbleBabble::getPieceDecayAmount() const {
-    return confettiHues[currentHues].decayTime;
+    return confettiHues[currentHues].decayAmount;
 }
 
 const bool BurbleBabble::getUseBlackGlitter() const {
     return confettiHues[currentHues].useBlackGlitter;
+}
+
+const uint16_t BurbleBabble::getPieceMinTime() const {
+    return confettiHues[currentHues].pieceMinTime;
+}
+
+const uint16_t BurbleBabble::getPieceMaxTime() const {
+    return confettiHues[currentHues].pieceMaxTime;
+}
+
+const uint64_t BurbleBabble::getPieceDecayTime() const {
+    return confettiHues[currentHues].decayTime;
+}
+
+BurbleBabble::BurbleBabble(uint16_t numLeds, uint8_t index) : BurbleBabble(numLeds) {
+    currentHues =  index;
 }

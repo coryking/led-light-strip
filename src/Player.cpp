@@ -14,6 +14,9 @@ Player::Player(uint32_t numLeds, uint8_t framesPerSecond, FancyLightMixer* fancy
     buffer = (CRGB *) malloc(sizeof(CRGB) * numLeds);
     this->mixer = new Mixer(numLeds);
     this->list = new RandomPatternList({
+#ifdef STRIP_OUTSIDE
+    new BurbleBabble(numLeds),
+#else
                                                new NoisyConfetti(numLeds),
 
 #ifdef USE_FIRE_PATTERNS
@@ -33,7 +36,7 @@ Player::Player(uint32_t numLeds, uint8_t framesPerSecond, FancyLightMixer* fancy
                                                new BpmPattern(numLeds),
                                                //new NoisePlusPalette(numLeds),
                                                //new RollingPattern(numLeds, ForestColors_p),
-
+#endif // STRIP_OUTSIDE
                                        });
 }
 

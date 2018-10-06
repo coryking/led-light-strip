@@ -9,18 +9,23 @@
 #include <vector>
 #include "Noise.h"
 
-#define DEFAULT_DECAY_TIME 10
+#define DEFAULT_DECAY_TIME 0
+#define DEFAULT_DECAY_AMOUNT 10
 
 class BurbleBabble : public Noise {
 public:
     typedef struct {
         uint8_t minHue;
         uint8_t maxHue;
+        uint8_t decayAmount;
         uint16_t decayTime;
         bool useBlackGlitter;
+        uint16_t pieceMinTime;
+        uint16_t pieceMaxTime;
     } ConfettiHue;
 
     explicit BurbleBabble(uint16 numLeds);
+    explicit BurbleBabble(uint16_t numLeds, uint8_t index);
 
     void beginAnimation() override;
 
@@ -33,7 +38,10 @@ public:
     void newVariant() override;
 
     const uint8_t getPieceDecayAmount() const;
+    const uint64_t getPieceDecayTime() const;
     const bool getUseBlackGlitter() const;
+    const uint16_t getPieceMinTime() const;
+    const uint16_t getPieceMaxTime() const;
 
 
 protected:
@@ -43,9 +51,6 @@ private:
     uint8_t lowHue = HUE_YELLOW;
     uint8_t highHue = HUE_GREEN;
 
-    const uint8_t pieceMinTime=0;
-    const uint8_t pieceMaxTime=0;
-
 private:
 
     CRGB *confetti= nullptr;
@@ -53,16 +58,18 @@ private:
 
     uint8_t currentHues = 0;
     std::vector<ConfettiHue> confettiHues = {
-            {HUE_YELLOW, HUE_GREEN, DEFAULT_DECAY_TIME, false},
-            {HUE_PURPLE, HUE_PINK, DEFAULT_DECAY_TIME, false},
-            {HUE_BLUE, HUE_PURPLE, DEFAULT_DECAY_TIME, false},
-            {HUE_RED, HUE_ORANGE, DEFAULT_DECAY_TIME, false},
-            {HUE_GREEN, HUE_AQUA, DEFAULT_DECAY_TIME, false},
-            {HUE_GREEN, HUE_AQUA, DEFAULT_DECAY_TIME, false},
-            {HUE_PURPLE - 10, HUE_PURPLE + 10, DEFAULT_DECAY_TIME, true}
+            {HUE_PURPLE - 10, HUE_PURPLE + 10, 2, 10, true, 10, 200},
+            {HUE_ORANGE - 10, HUE_ORANGE + 10, 2, 10, true, 10, 200},
+            {HUE_YELLOW, HUE_GREEN, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0},
+            {HUE_PURPLE, HUE_PINK, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0},
+            {HUE_BLUE, HUE_PURPLE, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0},
+            {HUE_RED, HUE_ORANGE, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0},
+            {HUE_GREEN, HUE_AQUA, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0},
+            {HUE_GREEN, HUE_AQUA, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0},
 
     };
     uint64_t nextConfettiPieceTime = 0;
+    uint64_t nextDecayTime = 0;
 
 };
 
