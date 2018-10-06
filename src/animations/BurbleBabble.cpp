@@ -19,6 +19,9 @@ void BurbleBabble::beginAnimation() {
 
     if(confettiOpacity== nullptr)
         confettiOpacity = (uint8_t*)malloc(sizeof(uint8_t) * getNumLeds());
+
+    if(stickFactor== nullptr)
+        stickFactor = (uint8_t*)malloc(sizeof(uint8_t) * getNumLeds());
 }
 
 void BurbleBabble::endAnimation() {
@@ -32,6 +35,11 @@ void BurbleBabble::endAnimation() {
         free(confettiOpacity);
         confettiOpacity = nullptr;
     }
+
+    if(stickFactor!= nullptr) {
+        free(stickFactor);
+        stickFactor= nullptr;
+    }
 }
 
 uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
@@ -44,7 +52,11 @@ uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
         // random colored speckles that blink in and fade smoothly
         for (int i = 0; i < getNumLeds(); i++) {
             nblend(buffer[i], confetti[i], confettiOpacity[i]);
-            confettiOpacity[i] = qsub8(confettiOpacity[i], getPieceDecayAmount());
+            if(stickFactor[i] == 0) {
+                confettiOpacity[i] = qsub8(confettiOpacity[i], getPieceDecayAmount());
+            } else {
+                stickFactor[i] = qsub8(stickFactor[i],1);
+            }
         }
         nextDecayTime = time + getPieceDecayTime();
     }
@@ -58,6 +70,7 @@ uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
             confetti[pos] = CHSV(getHue(true), random8(200, 255), 255);
         }
         confettiOpacity[pos] = 255;
+        stickFactor[pos] = getStickFactor();
 
         nextConfettiPieceTime =
                 time +
@@ -118,6 +131,10 @@ const uint64_t BurbleBabble::getPieceDecayTime() const {
     return confettiHues[currentHues].decayTime;
 }
 
-BurbleBabble::BurbleBabble(uint16_t numLeds, uint8_t index) : BurbleBabble(numLeds) {
+BurbleBabble::BurbleBabble(uint16_t numLeds, uint8_t index) : Noise(numLeds) {
     currentHues =  index;
+}
+
+const uint8_t BurbleBabble::getStickFactor() const {
+    return confettiHues[currentHues].stickFactor;
 }

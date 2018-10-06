@@ -15,10 +15,10 @@ Player::Player(uint32_t numLeds, uint8_t framesPerSecond, FancyLightMixer* fancy
     this->mixer = new Mixer(numLeds);
     this->list = new RandomPatternList({
 #ifdef STRIP_OUTSIDE
-    new BurbleBabble(numLeds),
+    new BurbleBabble(numLeds,0),
+    //new BurbleBabble(numLeds,1),
 #else
                                                new NoisyConfetti(numLeds),
-
 #ifdef USE_FIRE_PATTERNS
                                        new MirrorPattern<FirePattern>(numLeds),
                                        new MirrorPattern<PalettePattern>(numLeds),
