@@ -48,6 +48,7 @@ void ICACHE_FLASH_ATTR Mixer::setNextPattern(AbstractPattern *nextPattern, uint1
     if (nextPattern == currentPattern) {
         syslog.log(LOG_DEBUG, "moving to new variant...");
         currentPattern->newVariant();
+        currentPattern->resetRuntime();
         return;
     }
 
