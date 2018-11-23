@@ -5,6 +5,7 @@
 #ifndef RGBWPLAY_RANDOMPATTERNLIST_H
 #define RGBWPLAY_RANDOMPATTERNLIST_H
 
+#include "config.h"
 #include <FastLED.h>
 #include <vector>
 #include "animations/AbstractPattern.h"
