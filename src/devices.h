@@ -19,6 +19,8 @@
 #define NUM_LEDS 102
 #define DATA_PIN D2
 
+const char* hostString = "ESP_BATH";
+
 #endif
 #ifdef STRIP_BABYROOM
 /* for the baby room
@@ -35,6 +37,8 @@
 #define HAS_IR_REMOTE
 #define IR_REMOTE_PIN D5
 //#define DEBUG_LOOP_TIMING
+
+const char* hostString = "ESP_BABY";
 #endif
 
 #ifdef STRIP_BEDROOM
@@ -50,6 +54,8 @@
 #define HAS_IR_REMOTE
 #define IR_REMOTE_PIN D5
 //#define DEBUG_LOOP_TIMING
+
+const char* hostString = "ESP_BDRM";
 #endif
 
 #ifdef STRIP_OUTSIDE
@@ -64,6 +70,8 @@
 #define FASTLED_ESP8266_DMA
 
 //#define DEBUG_LOOP_TIMING
+
+const char* hostString = "ESP_PATIO";
 
 #endif
 

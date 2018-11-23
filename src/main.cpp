@@ -72,8 +72,6 @@ extern uint32_t _frame_cnt;
 extern uint32_t _retry_cnt;
 #endif
 
-char hostString[16] = {0};
-
 long lastWifiReconnectAttempt = 0;
 
 void readFromEEPROM();
@@ -195,7 +193,7 @@ void ICACHE_FLASH_ATTR remoteCallback(RemoteButtons buttons) {
 void setup() {
     Serial.begin(9600);
     EEPROM.begin(sizeof(CHSV) + 2 * sizeof(uint8_t));
-    sprintf(hostString, "ESP_%06X", ESP.getChipId());
+    //sprintf(hostString, "ESP_%06X", subName); //ESP.getChipId());
     Serial.println();
     Serial.println(hostString);
 #ifndef DO_NOT_USE_WIFI
@@ -247,9 +245,9 @@ void setup() {
     taskManager.StartTask(&taskMonitorWifi);
     taskManager.StartTask(&mqttPubSub);
     Serial.println("Gonna connect");
-    //if (!MDNS.begin(hostString)) {
-    //    Serial.println("Error setting up MDNS responder!");
-    //}
+    if (!MDNS.begin(hostString)) {
+        Serial.println("Error setting up MDNS responder!");
+    }
     Serial.println("Done with setup!");
     taskManager.StartTask(&taskHandleOTA);
 #endif
