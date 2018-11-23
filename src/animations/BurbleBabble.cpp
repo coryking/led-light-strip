@@ -49,28 +49,12 @@ uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
         return 0;
 
     if(nextDecayTime <= time) {
-        // random colored speckles that blink in and fade smoothly
-        for (int i = 0; i < getNumLeds(); i++) {
-            nblend(buffer[i], confetti[i], confettiOpacity[i]);
-            if(stickFactor[i] == 0) {
-                confettiOpacity[i] = qsub8(confettiOpacity[i], getPieceDecayAmount());
-            } else {
-                stickFactor[i] = qsub8(stickFactor[i],1);
-            }
-        }
+        decayConfetti(buffer);
         nextDecayTime = time + getPieceDecayTime();
     }
 
     if(nextConfettiPieceTime <= time) {
-        int pos = random16(getNumLeds());
-
-        if(getUseBlackGlitter()){
-            confetti[pos] = CHSV(255,0,0);
-        } else {
-            confetti[pos] = CHSV(getHue(true), random8(200, 255), 255);
-        }
-        confettiOpacity[pos] = 255;
-        stickFactor[pos] = getStickFactor();
+        doNewConfettiPiece();
 
         nextConfettiPieceTime =
                 time +
@@ -80,6 +64,36 @@ uint16_t BurbleBabble::readFrame(CRGB *buffer, ulong time) {
     }
     return getNumLeds();
 
+}
+
+void BurbleBabble::doNewConfettiPiece() {
+    int pos = random16(getNumLeds());
+
+    switch(getGlitterType()) {
+            case GLITTER_BLACK:
+                confetti[pos] = CHSV(255, 0, 0);
+                break;
+            case GLITTER_WHITE:
+                confetti[pos] = CHSV(255, 0, 255);
+                break;
+            case GLITTER_COMPLIMENTARY:
+                confetti[pos] = CHSV(getHue(true), random8(200, 255), 255);
+                break;
+        }
+
+    confettiOpacity[pos] = 255;
+    stickFactor[pos] = getStickFactor();
+}
+
+void BurbleBabble::decayConfetti(CRGB *buffer) const {// random colored speckles that blink in and fade smoothly
+    for (int i = 0; i < getNumLeds(); i++) {
+            nblend(buffer[i], confetti[i], confettiOpacity[i]);
+            if(stickFactor[i] == 0) {
+                confettiOpacity[i] = qsub8(confettiOpacity[i], getPieceDecayAmount());
+            } else {
+                stickFactor[i] = qsub8(stickFactor[i], 1);
+            }
+        }
 }
 
 BurbleBabble::~BurbleBabble() {
@@ -120,8 +134,8 @@ const uint8_t BurbleBabble::getPieceDecayAmount() const {
     return confettiHues[currentHues].decayAmount;
 }
 
-const bool BurbleBabble::getUseBlackGlitter() const {
-    return confettiHues[currentHues].useBlackGlitter;
+const GlitterType BurbleBabble::getGlitterType() const {
+    return confettiHues[currentHues].glitterType;
 }
 
 const uint16_t BurbleBabble::getPieceMinTime() const {
