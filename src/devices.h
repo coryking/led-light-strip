@@ -5,6 +5,12 @@
 #ifndef RGBWPLAY_DEVICES_H
 #define RGBWPLAY_DEVICES_H
 
+// Sends out a bunch of stats..
+// #define FASTLED_DEBUG_COUNT_FRAME_RETRIES
+
+// Even more stats
+// #define DEBUG_SHOW_STATS
+
 #ifdef STRIP_BATHROOM
 // for the bathroom
 #    warning "Bathroom strip"

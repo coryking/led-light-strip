@@ -66,8 +66,11 @@ private:
 
     uint8_t currentHues = 0;
     std::vector<ConfettiHue> confettiHues = {
+            {HUE_GREEN - 10, HUE_GREEN + 10, 2, 10, GLITTER_WHITE, 10, 200,200},
+            {HUE_RED - 5, HUE_RED + 5, 2, 10, GLITTER_WHITE, 10, 200, 200},
             {HUE_PURPLE - 10, HUE_PURPLE + 10, 2, 10, GLITTER_BLACK, 10, 200,200},
-            {HUE_ORANGE - 5, HUE_ORANGE + 5, 2, 10, GLITTER_BLACK, 10, 200, 200},
+            {HUE_BLUE - 10, HUE_BLUE + 10, 2, 10, GLITTER_BLACK, 10, 200,200},
+            //{HUE_ORANGE - 5, HUE_ORANGE + 5, 2, 10, GLITTER_BLACK, 10, 200, 200},
             //{HUE_YELLOW, HUE_GREEN, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0,50},
            /* {HUE_PURPLE, HUE_PINK, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0,10},
             {HUE_BLUE, HUE_PURPLE, DEFAULT_DECAY_AMOUNT, DEFAULT_DECAY_TIME, false,0,0,10},

@@ -1,7 +1,7 @@
 #include "devices.h"
 
 #define FASTLED_ESP8266_RAW_PIN_ORDER
-#define FASTLED_DEBUG_COUNT_FRAME_RETRIES
+
 
 //#define FASTLED_ALLOW_INTERRUPTS 0
 #define FASTLED_INTERRUPT_RETRY_COUNT 1
@@ -80,13 +80,15 @@ void readFromEEPROM();
 
 void writeToEEPROM();
 
+#ifdef DEBUG_SHOW_STATS
 void ICACHE_FLASH_ATTR showStats(uint32_t deltaTime);
-
 FunctionTask taskShowStats(showStats, MsToTaskTime(10000));
+#endif
 
+#ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
 void ICACHE_FLASH_ATTR showRetries(uint32_t deltaTime);
-
 FunctionTask taskShowRetries(showRetries, MsToTaskTime(30000));
+#endif
 
 void ICACHE_FLASH_ATTR showNewColor() {
     Serial.printf("h: %i, s: %i, v: %i, b: %i\n", ledColorValue.h, ledColorValue.s, ledColorValue.v,
@@ -255,7 +257,9 @@ void setup() {
 #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
     taskManager.StartTask(&taskShowRetries);
 #endif
+#ifdef DEBUG_SHOW_STATS
     taskManager.StartTask(&taskShowStats);
+#endif
     taskManager.StartTask(&player);
     taskManager.StartTask(&brightness);
 
@@ -321,9 +325,15 @@ void onMonitorWifi(uint32_t deltaTime) {
 
 #endif
 
+#ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
+
 void ICACHE_FLASH_ATTR showRetries(uint32_t deltaTime) {
     syslog.logf(LOG_DEBUG, "R: %i, F: %i\n", _retry_cnt, _frame_cnt);
 }
+
+#endif
+
+#ifdef DEBUG_SHOW_STATS
 
 void ICACHE_FLASH_ATTR showStats(uint32_t deltaTime) {
 
@@ -340,3 +350,5 @@ void ICACHE_FLASH_ATTR showStats(uint32_t deltaTime) {
     syslog.log(LOG_DEBUG, lb);
     Serial.println(lb);
 }
+
+#endif
