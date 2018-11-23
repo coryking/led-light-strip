@@ -19,7 +19,7 @@
 #define NUM_LEDS 102
 #define DATA_PIN D2
 
-const char* hostString = "ESP_BATH";
+const char* hostString = "esp_bath";
 
 #endif
 #ifdef STRIP_BABYROOM
@@ -38,7 +38,7 @@ const char* hostString = "ESP_BATH";
 #define IR_REMOTE_PIN D5
 //#define DEBUG_LOOP_TIMING
 
-const char* hostString = "ESP_BABY";
+const char* hostString = "esp_baby";
 #endif
 
 #ifdef STRIP_BEDROOM
@@ -55,7 +55,7 @@ const char* hostString = "ESP_BABY";
 #define IR_REMOTE_PIN D5
 //#define DEBUG_LOOP_TIMING
 
-const char* hostString = "ESP_BDRM";
+const char* hostString = "esp_bdrm";
 #endif
 
 #ifdef STRIP_OUTSIDE
@@ -71,7 +71,7 @@ const char* hostString = "ESP_BDRM";
 
 //#define DEBUG_LOOP_TIMING
 
-const char* hostString = "ESP_PATIO";
+const char* hostString = "esp_patio";
 
 #endif
 

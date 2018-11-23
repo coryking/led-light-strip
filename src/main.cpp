@@ -197,16 +197,22 @@ void setup() {
     Serial.println();
     Serial.println(hostString);
 #ifndef DO_NOT_USE_WIFI
-    setupWiFi();
+    setupWiFi(hostString);
     syslog.server(SYSLOG_SERVER, SYSLOG_PORT);
     syslog.deviceHostname(hostString);
+
+    if (!MDNS.begin(hostString)) {
+        Serial.println("Error setting up MDNS responder!");
+    }
+
+    ArduinoOTA.setHostname(hostString);
     ArduinoOTA.begin();
 #endif
 
     syslog.appName(APP_NAME);
     syslog.defaultPriority(LOG_DAEMON);
     syslog.logf(LOG_WARNING, "Hello from [%s]\n", hostString);
-    Serial.printf("Hello from [%s]\n", hostString);
+    Serial.printf("Hi from [%s]\n", hostString);
 
 #ifdef MULTI_LED
     FastLED.addLeds<SK6812_PORTA, NUM_STRIPS>(player.getFastLEDBuffer(), LEDS_PER_STRIP);
@@ -245,9 +251,7 @@ void setup() {
     taskManager.StartTask(&taskMonitorWifi);
     taskManager.StartTask(&mqttPubSub);
     Serial.println("Gonna connect");
-    if (!MDNS.begin(hostString)) {
-        Serial.println("Error setting up MDNS responder!");
-    }
+
     Serial.println("Done with setup!");
     taskManager.StartTask(&taskHandleOTA);
 #endif

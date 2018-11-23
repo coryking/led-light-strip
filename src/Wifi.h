@@ -16,10 +16,11 @@ void reconnectWiFi() {
     WiFi.begin(YOUR_WIFI_SSID, YOUR_WIFI_PASSWD);
 }
 
-void setupWiFi() {
+void setupWiFi(const char *theHostName) {
     static WiFiEventHandler e1, e2;
 
     WiFi.mode(WIFI_STA);
+    WiFi.hostname(theHostName);
 
     //onSyncEvent_t onSyncHandler = onNTPSyncEvent;
     //NTP.onNTPSyncEvent(onSyncHandler);
