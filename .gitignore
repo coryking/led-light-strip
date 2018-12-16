@@ -45,3 +45,5 @@ cmake-build-debug
 *.exe
 *.out
 *.app
+
+.vscode
