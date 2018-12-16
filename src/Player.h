@@ -15,7 +15,7 @@
 
 #define FRAMES_PER_SECOND  200
 #define DEFAULT_BRIGHTNESS 255
-#define POWER_TRANSITION_MS 500
+#define POWER_TRANSITION_MS 750
 
 typedef enum {
     Mode_FixedPattern = 0,

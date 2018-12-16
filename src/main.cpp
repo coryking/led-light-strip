@@ -93,6 +93,8 @@ void ICACHE_FLASH_ATTR showNewColor() {
                   FastLED.getBrightness());
     fancyLightMixer->setHue(ledColorValue.h);
     fancyLightMixer->setSaturation(ledColorValue.s);
+    player.setPower(true); // always make sure the power is on when we show a new color...
+    player.setFancyLightMode();
     writeToEEPROM();
 }
 
